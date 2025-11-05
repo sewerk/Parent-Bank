@@ -13,7 +13,7 @@
 1. **Tech-Savvy Parents**: Looking for digital solutions to manage family finances and teach financial literacy
 2. **First-Time Allowance Givers**: Parents starting to give their children regular pocket money
 3. **Multi-Child Families**: Parents managing finances for multiple children across different age groups
-4. **Financial Literacy Advocates**: Parents who want to actively teach their children about saving, spending, and money management
+4. **Financial Literacy Advocates**: Parents who want to actively teach their children about saving, spending, money management, and how interest works to encourage savings behavior
 
 ## Objective
 
@@ -23,8 +23,9 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 1. Enable parents to create and manage virtual bank accounts for their children
 2. Facilitate controlled financial transactions between parents and children
 3. Teach children financial responsibility through tracked transactions and balance management
-4. Provide a safe environment for children to learn money management without real-world financial risks
-5. Sync family financial data securely across multiple devices using Firebase
+4. Educate children about interest rates and how savings can generate profits over time
+5. Provide a safe environment for children to learn money management without real-world financial risks
+6. Sync family financial data securely across multiple devices using Firebase
 
 ## Features
 
@@ -56,18 +57,17 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 - **Transaction Categories**: Select from predefined expense categories
 
 ### 5. Scheduled Transactions
-- **Create Recurring Transactions**: Set up automated recurring transactions (e.g., weekly allowance)
-- **Frequency Options**: Daily, weekly, bi-weekly, monthly, custom intervals
+- **Create Recurring Transactions**: Set up automated recurring transactions (e.g., weekly allowance, monthly interest)
+- **Fixed or Percentage-Based**: Support both fixed amount transactions and percentage-based calculations (e.g., 5% monthly interest on account balance)
+- **Interest Education**: Teach children how interest works and that savings generate profits over time
+- **Frequency Options**: Daily, weekly, bi-weekly, monthly
 - **Start/End Dates**: Define when scheduled transactions begin and optionally end
 - **Edit/Pause/Delete**: Modify or temporarily pause scheduled transactions
 - **Notification Reminders**: Alert parents before scheduled transactions execute
 
 ### 6. Transaction History
-- **Complete History**: View all transactions across all accounts or per individual account
-- **Filter Options**: Filter by date range, transaction type, child, amount, category
-- **Search Functionality**: Search transactions by title or notes
+- **Per-Account History**: View transaction history for individual accounts only
 - **Transaction Details**: Tap any transaction to view full details
-- **Export Data**: Export transaction history to CSV/PDF for record-keeping
 
 ### 7. Child Dashboard
 - **View Balance**: Display current account balance prominently
@@ -91,9 +91,8 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 
 ### 10. Settings & Configuration
 - **App Settings**: Theme, language, notification preferences
-- **Security Settings**: PIN/biometric authentication, session timeout
+- **Security Settings**: PIN/biometric authentication
 - **Family Settings**: Family name, default currency, family code for joining
-- **Privacy Settings**: Data sharing preferences, backup settings
 
 ## Usage Flow
 
@@ -126,8 +125,7 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
    - Assign to child(ren)
    - Save schedule
 5. **View History**:
-   - Access transaction history
-   - Filter by child, date, type
+   - Access transaction history per account
    - Review spending patterns
 
 ### Child User Flow
@@ -135,9 +133,8 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 #### Initial Setup
 1. Receive invite/family code from parent
 2. Download and install Parent Bank app
-3. Create account or join using family code
+3. Join parent-created account using family code
 4. Complete profile setup
-5. View welcome tutorial
 
 #### Daily Operations
 1. **Check Balance**: Open app to view current balance
@@ -151,13 +148,6 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
    - Wait for parent approval
 4. **Track Requests**: Check status of pending requests
 5. **Receive Notifications**: Get notified when transactions are approved/denied
-
-### First-Time User Onboarding
-1. Welcome screen with app overview
-2. Role selection (Parent or Child)
-3. Account creation or family code entry
-4. Tutorial walkthrough of key features
-5. Setup wizard for initial configuration
 
 ## Technology and Architecture
 
@@ -232,157 +222,6 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 - Firebase SDK integration (actual implementations)
 - Local database (SQLDelight or Realm)
 - Platform-specific utilities
-
-### Data Models
-
-#### Family
-```kotlin
-data class Family(
-    val id: String,
-    val name: String,
-    val createdBy: String,
-    val createdAt: Timestamp,
-    val members: List<String>, // User IDs
-    val currency: String = "USD"
-)
-```
-
-#### User
-```kotlin
-data class User(
-    val id: String,
-    val familyId: String,
-    val name: String,
-    val email: String?,
-    val role: UserRole, // PARENT or CHILD
-    val age: Int?,
-    val profilePictureUrl: String?,
-    val createdAt: Timestamp
-)
-
-enum class UserRole {
-    PARENT, CHILD
-}
-```
-
-#### Account
-```kotlin
-data class Account(
-    val id: String,
-    val familyId: String,
-    val userId: String, // Child user ID
-    val balance: Double,
-    val currency: String = "USD",
-    val createdAt: Timestamp,
-    val isActive: Boolean = true
-)
-```
-
-#### Transaction
-```kotlin
-data class Transaction(
-    val id: String,
-    val familyId: String,
-    val accountId: String,
-    val type: TransactionType,
-    val amount: Double,
-    val title: String,
-    val category: String?,
-    val notes: String?,
-    val date: Timestamp,
-    val createdBy: String, // User ID
-    val status: TransactionStatus,
-    val approvedBy: String? = null,
-    val createdAt: Timestamp
-)
-
-enum class TransactionType {
-    INCOME, EXPENSE
-}
-
-enum class TransactionStatus {
-    PENDING, APPROVED, DENIED, COMPLETED
-}
-```
-
-#### ScheduledTransaction
-```kotlin
-data class ScheduledTransaction(
-    val id: String,
-    val familyId: String,
-    val accountId: String,
-    val type: TransactionType,
-    val amount: Double,
-    val title: String,
-    val category: String?,
-    val frequency: Frequency,
-    val startDate: Timestamp,
-    val endDate: Timestamp?,
-    val isActive: Boolean = true,
-    val createdBy: String,
-    val createdAt: Timestamp
-)
-
-enum class Frequency {
-    DAILY, WEEKLY, BIWEEKLY, MONTHLY, CUSTOM
-}
-```
-
-### Firebase Structure
-
-```
-/families/{familyId}
-  - name: String
-  - createdBy: String
-  - createdAt: Timestamp
-  - currency: String
-
-/users/{userId}
-  - familyId: String
-  - name: String
-  - email: String
-  - role: String
-  - age: Int
-  - profilePictureUrl: String
-  - createdAt: Timestamp
-
-/accounts/{accountId}
-  - familyId: String
-  - userId: String
-  - balance: Double
-  - currency: String
-  - createdAt: Timestamp
-  - isActive: Boolean
-
-/transactions/{transactionId}
-  - familyId: String
-  - accountId: String
-  - type: String
-  - amount: Double
-  - title: String
-  - category: String
-  - notes: String
-  - date: Timestamp
-  - createdBy: String
-  - status: String
-  - approvedBy: String
-  - createdAt: Timestamp
-
-/scheduledTransactions/{scheduledTransactionId}
-  - familyId: String
-  - accountId: String
-  - type: String
-  - amount: Double
-  - title: String
-  - category: String
-  - frequency: String
-  - startDate: Timestamp
-  - endDate: Timestamp
-  - isActive: Boolean
-  - createdBy: String
-  - lastExecuted: Timestamp
-  - createdAt: Timestamp
-```
 
 ## Error Handling
 
@@ -472,13 +311,6 @@ interface ErrorHandler {
 - Firebase project: `parent-bank-dev`
 - Debug logging enabled
 - Mock data available
-- Test payment methods
-
-#### Staging
-- Firebase project: `parent-bank-staging`
-- Limited logging
-- Real Firebase services
-- Beta testing enabled
 
 #### Production
 - Firebase project: `parent-bank-prod`
@@ -503,214 +335,85 @@ buildTypes {
 }
 ```
 
-#### Feature Flags
-- Enable/disable features without app updates
-- A/B testing capabilities
-- Gradual rollout of new features
-- Firebase Remote Config integration
-
-### Firebase Configuration
-
-#### Security Rules Example
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Helper functions
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isParent(familyId) {
-      return isSignedIn() &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'PARENT' &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.familyId == familyId;
-    }
-
-    function isChild(familyId) {
-      return isSignedIn() &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'CHILD' &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.familyId == familyId;
-    }
-
-    // Transactions
-    match /transactions/{transactionId} {
-      allow read: if isSignedIn() &&
-                     (isParent(resource.data.familyId) ||
-                      (isChild(resource.data.familyId) &&
-                       resource.data.accountId == get(/databases/$(database)/documents/accounts/$(request.auth.uid)).id));
-      allow create: if isSignedIn() &&
-                       (isParent(request.resource.data.familyId) ||
-                        isChild(request.resource.data.familyId));
-      allow update: if isParent(resource.data.familyId);
-      allow delete: if isParent(resource.data.familyId);
-    }
-
-    // Accounts
-    match /accounts/{accountId} {
-      allow read: if isSignedIn() &&
-                     (isParent(resource.data.familyId) ||
-                      (isChild(resource.data.familyId) && resource.data.userId == request.auth.uid));
-      allow write: if isParent(resource.data.familyId);
-    }
-
-    // Similar rules for families, users, scheduledTransactions...
-  }
-}
-```
-
 ### API Keys & Secrets
 - Store API keys in secure configuration files
 - Use environment variables for sensitive data
 - Never commit secrets to version control
 - Rotate keys periodically
 
-## Rules (Dos and Don'ts)
+## Rules
 
-### Development Dos ✓
+### Development Guidelines
 
-1. **DO** Use Kotlin Multiplatform best practices
-   - Maximize code sharing in common module
+1. **Architecture & Code Organization**
+   - Use Kotlin Multiplatform best practices with maximum code sharing in common module
+   - Follow clean architecture: separate UI, Domain, and Data layers
    - Use `expect`/`actual` pattern for platform-specific implementations
-   - Keep UI layer platform-specific
+   - Keep UI layer platform-specific (Compose for Android, SwiftUI for iOS)
+   - Use dependency injection and write testable code
 
-2. **DO** Implement proper security
-   - Validate all inputs on client and server side
+2. **Security**
+   - Store API keys securely using environment variables (never hardcode)
+   - Validate all inputs on both client and server side
    - Use Firebase Security Rules effectively
-   - Encrypt sensitive data
-   - Implement rate limiting for API calls
+   - Encrypt sensitive data and implement rate limiting
+   - Never log sensitive user information or expose internal IDs
 
-3. **DO** Follow clean architecture principles
-   - Separate concerns (UI, Domain, Data)
-   - Use dependency injection
-   - Write testable code
-   - Keep business logic in the domain layer
+3. **Error Handling & Logging**
+   - Implement proper error handling (don't let exceptions crash the app)
+   - Display user-friendly error messages (avoid technical jargon)
+   - Log important events with appropriate levels
+   - Use crash reporting tools (Firebase Crashlytics)
+   - Never fail silently; provide user feedback
 
-4. **DO** Handle offline scenarios
-   - Cache data locally
-   - Queue operations for sync
-   - Provide clear offline indicators
-   - Gracefully handle sync conflicts
-
-5. **DO** Write comprehensive tests
-   - Unit tests for business logic
-   - Integration tests for repositories
-   - UI tests for critical flows
-   - Test edge cases and error scenarios
-
-6. **DO** Implement proper logging
-   - Log important events and errors
-   - Use different log levels appropriately
-   - Remove sensitive data from logs
-   - Use crash reporting tools
-
-7. **DO** Optimize performance
-   - Lazy load data when appropriate
-   - Implement pagination for large lists
-   - Use image caching
+4. **Performance & Optimization**
+   - Lazy load data and implement pagination for large lists
+   - Cache data locally for offline support
    - Minimize Firebase reads/writes
-
-8. **DO** Follow platform guidelines
-   - Material Design for Android
-   - Human Interface Guidelines for iOS
-   - Platform-specific navigation patterns
-   - Accessibility standards
-
-9. **DO** Version control properly
-   - Use meaningful commit messages
-   - Create feature branches
-   - Review code before merging
-   - Tag releases
-
-10. **DO** Document code
-    - Write clear comments for complex logic
-    - Maintain up-to-date README
-    - Document API endpoints and data models
-    - Keep PRD updated with changes
-
-### Development Don'ts ✗
-
-1. **DON'T** Store sensitive data insecurely
-   - Never hardcode API keys or credentials
-   - Don't store passwords in plain text
-   - Don't log sensitive user information
-   - Don't expose internal IDs to users
-
-2. **DON'T** Bypass validation
-   - Don't trust client-side validation alone
-   - Don't allow negative amounts
-   - Don't skip business rule validation
-   - Don't allow unauthorized access
-
-3. **DON'T** Create tight coupling
-   - Don't mix UI logic with business logic
-   - Don't create circular dependencies
-   - Don't use platform-specific code in common module
-   - Don't hardcode values that should be configurable
-
-4. **DON'T** Ignore error handling
-   - Don't let exceptions crash the app
-   - Don't show technical errors to users
-   - Don't fail silently
-   - Don't ignore edge cases
-
-5. **DON'T** Compromise user experience
+   - Optimize images and manage memory properly
    - Don't block UI thread with heavy operations
-   - Don't ignore loading states
-   - Don't make users wait without feedback
-   - Don't use confusing terminology
 
-6. **DON'T** Ignore performance
-   - Don't load all data at once
-   - Don't make unnecessary network calls
-   - Don't keep large objects in memory
-   - Don't ignore memory leaks
+5. **Testing**
+   - Write unit tests for business logic (>80% coverage for shared code)
+   - Create integration tests for repositories
+   - Implement UI tests for critical flows
+   - Test edge cases and error scenarios
+   - Never deploy untested code
 
-7. **DON'T** Skip testing
-   - Don't deploy untested code
-   - Don't assume "it works on my machine"
-   - Don't ignore test failures
-   - Don't skip regression testing
+6. **Platform Guidelines & UX**
+   - Follow Material Design 3 for Android
+   - Follow Human Interface Guidelines for iOS
+   - Respect platform-specific navigation patterns
+   - Implement proper accessibility (TalkBack/VoiceOver)
+   - Provide clear loading states and user feedback
 
-8. **DON'T** Violate platform conventions
-   - Don't use Android patterns on iOS
-   - Don't ignore platform-specific navigation
-   - Don't use non-standard UI components
-   - Don't ignore accessibility
+7. **Code Quality**
+   - Use meaningful commit messages and feature branches
+   - Review code before merging
+   - Document complex logic with clear comments
+   - Keep the app simple and intuitive (avoid unnecessary complexity)
+   - Maintain up-to-date documentation
 
-9. **DON'T** Overcomplicate
-   - Don't add unnecessary abstractions
-   - Don't prematurely optimize
-   - Don't add features not in requirements
-   - Don't create overly complex data models
+### Business Rules
 
-10. **DON'T** Ignore security
-    - Don't skip authentication checks
-    - Don't allow SQL injection
-    - Don't trust user input
-    - Don't expose sensitive endpoints
+1. **Transaction Authorization**
+   - Parent-initiated transactions process immediately without confirmation
+   - Child-initiated transactions require parent approval
+   - Only parents can approve/deny transaction requests
+   - All transaction amounts must be positive
 
-### Business Rules Dos ✓
+2. **Account Access & Permissions**
+   - Parents have full visibility of all child accounts
+   - Children can only view and manage their own account
+   - Children cannot view siblings' account details
+   - Children cannot create scheduled transactions
 
-1. **DO** Enforce parent approval for child-initiated transactions
-2. **DO** Process parent-initiated transactions immediately
-3. **DO** Validate all transaction amounts are positive
-4. **DO** Prevent negative account balances
-5. **DO** Sync data in real-time across devices
-6. **DO** Maintain complete transaction audit trail
-7. **DO** Allow parents full visibility of all child accounts
-8. **DO** Restrict child access to only their own account
-
-### Business Rules Don'ts ✗
-
-1. **DON'T** Allow children to approve their own transactions
-2. **DON'T** Allow children to modify parent-created transactions
-3. **DON'T** Allow children to view other siblings' account details
-4. **DON'T** Allow transactions that would create negative balance
-5. **DON'T** Allow deletion of transaction history
-6. **DON'T** Allow children to create scheduled transactions
-7. **DON'T** Allow unauthorized access to family data
-8. **DON'T** Process transactions without proper validation
+3. **Data Integrity**
+   - Prevent negative account balances
+   - Maintain complete transaction audit trail
+   - Never allow deletion of transaction history
+   - Sync data in real-time across devices
+   - Validate all operations before processing
 
 ## Tasks
 
@@ -726,7 +429,7 @@ service cloud.firestore {
 - [ ] Set up CI/CD pipeline (GitHub Actions or similar)
 
 #### Task 1.2: Firebase Setup
-- [ ] Create Firebase projects (dev, staging, prod)
+- [ ] Create Firebase projects (dev, prod)
 - [ ] Add Firebase to Android app
 - [ ] Add Firebase to iOS app
 - [ ] Configure Firebase Authentication
@@ -797,14 +500,12 @@ service cloud.firestore {
 - [ ] DenyTransactionUseCase
 - [ ] GetTransactionHistoryUseCase
 - [ ] GetPendingTransactionsUseCase
-- [ ] FilterTransactionsUseCase
-- [ ] ExportTransactionHistoryUseCase
 
 #### Task 3.4: Use Cases - Scheduled Transactions
-- [ ] CreateScheduledTransactionUseCase
+- [ ] CreateScheduledTransactionUseCase (support fixed and percentage-based)
 - [ ] UpdateScheduledTransactionUseCase
 - [ ] DeleteScheduledTransactionUseCase
-- [ ] ExecuteScheduledTransactionUseCase
+- [ ] ExecuteScheduledTransactionUseCase (handle both fixed amounts and percentage calculations)
 - [ ] GetScheduledTransactionsUseCase
 - [ ] PauseScheduledTransactionUseCase
 
@@ -817,10 +518,9 @@ service cloud.firestore {
 
 ### Phase 4: UI - Android (Week 7-9)
 
-#### Task 4.1: Android - Authentication & Onboarding
+#### Task 4.1: Android - Authentication & Setup
 - [ ] Create login screen (Compose)
 - [ ] Create registration screen
-- [ ] Create onboarding flow
 - [ ] Implement role selection
 - [ ] Create family creation screen
 - [ ] Create join family screen
@@ -830,8 +530,8 @@ service cloud.firestore {
 - [ ] Create account management screen
 - [ ] Create transaction creation screen
 - [ ] Create transaction approval screen
-- [ ] Create scheduled transaction screen
-- [ ] Create transaction history screen with filters
+- [ ] Create scheduled transaction screen (support fixed and percentage-based)
+- [ ] Create transaction history screen
 - [ ] Create family settings screen
 
 #### Task 4.3: Android - Child Screens
@@ -860,10 +560,9 @@ service cloud.firestore {
 
 ### Phase 5: UI - iOS (Week 10-12)
 
-#### Task 5.1: iOS - Authentication & Onboarding
+#### Task 5.1: iOS - Authentication & Setup
 - [ ] Create login screen (SwiftUI)
 - [ ] Create registration screen
-- [ ] Create onboarding flow
 - [ ] Implement role selection
 - [ ] Create family creation screen
 - [ ] Create join family screen
@@ -873,8 +572,8 @@ service cloud.firestore {
 - [ ] Create account management screen
 - [ ] Create transaction creation screen
 - [ ] Create transaction approval screen
-- [ ] Create scheduled transaction screen
-- [ ] Create transaction history screen with filters
+- [ ] Create scheduled transaction screen (support fixed and percentage-based)
+- [ ] Create transaction history screen
 - [ ] Create family settings screen
 
 #### Task 5.3: iOS - Child Screens
@@ -1054,12 +753,11 @@ service cloud.firestore {
 #### Task 11.3: Future Enhancements
 - [ ] Plan feature roadmap
 - [ ] Implement savings goals feature
-- [ ] Add interest/rewards system
+- [ ] Expand interest/rewards system
 - [ ] Implement transfer between siblings
 - [ ] Add spending analytics and insights
 - [ ] Create educational content for financial literacy
 - [ ] Multi-currency support
-- [ ] Export statements
 
 ## Success Metrics
 
@@ -1106,9 +804,10 @@ service cloud.firestore {
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | 2025-11-04 | Initial | Initial PRD creation |
+| 1.1 | 2025-11-05 | Updated | Added interest rate education feature; Updated scheduled transactions to support percentage-based calculations; Removed custom frequency intervals; Simplified transaction history to per-account only; Removed filter, search, and export functionality; Removed session timeout and privacy settings; Updated child setup flow; Removed tutorials/onboarding; Removed data models section; Removed staging environment and feature flags; Removed Firebase configuration section; Simplified rules section |
 
 ---
 
-**Document Status**: Draft
-**Last Updated**: 2025-11-04
+**Document Status**: Updated
+**Last Updated**: 2025-11-05
 **Next Review**: Upon project kickoff
