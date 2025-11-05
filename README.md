@@ -15,7 +15,7 @@ The application creates a safe environment where children can learn money manage
 - **Family Management**: Create family units with multiple parents and children
 - **Account Management**: Parents create and manage individual accounts for each child
 - **Transaction Control**:
-  - Parents can add transactions with positive (income) or negative (spending) amounts
+  - Parents can add Income (increases balance) and Expenses (decreases balance)
   - Children request transactions that require parent approval
   - Support for negative balances to teach loan/credit concepts
 - **Scheduled Transactions**: Set up recurring transactions (allowances, interest payments) with support for both fixed amounts and percentage-based calculations

@@ -45,12 +45,13 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 - **Delete/Archive Accounts**: Remove or archive child accounts when needed
 
 ### 3. Transaction Management (Parent)
-- **Add Transactions**: Record transactions with positive amounts (income) or negative amounts (expenses/spending)
+- **Add Income**: Record income transactions (allowance, gifts, rewards) to child accounts
+- **Add Expenses**: Record expenses from child accounts (purchases, withdrawals)
 - **Instant Processing**: Parent-created transactions are processed immediately without confirmation
-- **Transaction Details**: Include title, amount (+ or -), date, category, and optional notes
+- **Transaction Details**: Include title, amount, date, category, and optional notes
 - **Review Child Requests**: Approve or deny transaction requests initiated by children
 - **Bulk Transactions**: Apply the same transaction to multiple children simultaneously
-- **Loan/Credit Support**: Allow negative balances to teach children about loans and credit concepts
+- **Loan/Credit Support**: Balances can become negative to teach children about loans and credit concepts
 
 ### 4. Transaction Management (Child)
 - **Request Transactions**: Submit expense or withdrawal requests to parents
@@ -94,10 +95,10 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 - **In-App Notifications**: Notification center within the app
 
 ### 10. Settings & Configuration
-- **App Settings**: Theme, language selection (English, Polish), notification preferences
+- **App Settings**: Theme, notification preferences
 - **Security Settings**: PIN/biometric authentication
 - **Family Settings**: Family name, default currency, family code for joining
-- **Multi-Language Support**: Full app support for English and Polish from launch
+- **Multi-Language Support**: Automatic language detection from system settings (English, Polish)
 
 ## Usage Flow
 
@@ -409,8 +410,9 @@ buildTypes {
 9. **Internationalization (i18n)**
    - Support English and Polish from launch
    - Use resource files for all user-facing strings
+   - Automatically detect language from system settings (no manual language switcher)
    - Design UI to accommodate different text lengths
-   - Handle date, time, and currency formats appropriately
+   - Handle date, time, and currency formats appropriately based on system locale
    - Test all features in both languages
 
 ### Business Rules
@@ -419,7 +421,7 @@ buildTypes {
    - Parent-initiated transactions process immediately without confirmation
    - Child-initiated transactions require parent approval
    - Only parents can approve/deny transaction requests
-   - Transactions use signed amounts: positive for income, negative for spending
+   - Transactions have separate types: Income (adds to balance) and Expense (subtracts from balance)
 
 2. **Account Access & Permissions**
    - Parents have full visibility of all child accounts
@@ -468,10 +470,10 @@ buildTypes {
 ### Phase 2: Core Features - Data Layer (Week 3-4) - OFFLINE ONLY
 
 #### Task 2.1: Data Models (Offline-First)
-- [ ] Create domain models (Family, User, Account, Transaction with signed amounts, ScheduledTransaction)
-- [ ] Design Transaction model to support positive (income) and negative (spending) amounts
+- [ ] Create domain models (Family, User, Account, Transaction, ScheduledTransaction)
+- [ ] Design Transaction model with separate types: Income and Expense
 - [ ] Design Account model to allow negative balances (loan/credit feature)
-- [ ] Create enums (UserRole, TransactionStatus, Frequency)
+- [ ] Create enums (UserRole, TransactionType, TransactionStatus, Frequency)
 - [ ] Add data validation logic with fail-fast approach
 - [ ] Add i18n keys for all user-facing text in models
 
@@ -480,7 +482,7 @@ buildTypes {
 - [ ] Implement FamilyRepository with local database
 - [ ] Implement UserRepository with local database
 - [ ] Implement AccountRepository with local database (support negative balances)
-- [ ] Implement TransactionRepository with local database (support signed amounts)
+- [ ] Implement TransactionRepository with local database (Income and Expense types)
 - [ ] Implement ScheduledTransactionRepository with local database
 - [ ] Add fail-fast error handling and result wrapping
 - [ ] Test all repositories work completely offline
@@ -522,7 +524,8 @@ buildTypes {
 - [ ] Implement balance validation (allow negative balances for loan/credit)
 - [ ] Implement permission checks (parent vs child)
 - [ ] Implement transaction approval logic
-- [ ] Add transaction amount validation (support signed amounts: +/-)
+- [ ] Add transaction amount validation (positive amounts only)
+- [ ] Add transaction type validation (Income or Expense)
 - [ ] Add date validation
 - [ ] Use fail-fast validation (crash on invalid data)
 
@@ -534,16 +537,16 @@ buildTypes {
 - [ ] Implement role selection with i18n support
 - [ ] Create family creation screen with i18n support
 - [ ] Create join family screen with i18n support
-- [ ] Implement language switcher (English/Polish)
+- [ ] Implement automatic language detection from system settings
 
 #### Task 4.2: Android - Parent Screens
 - [ ] Create parent dashboard/home screen (show negative balances clearly)
 - [ ] Create account management screen
-- [ ] Create transaction creation screen (support positive/negative amounts)
+- [ ] Create transaction creation screen (separate Income and Expense options)
 - [ ] Create transaction approval screen
 - [ ] Create scheduled transaction screen (support fixed and percentage-based)
 - [ ] Create transaction history screen
-- [ ] Create family settings screen with language selection
+- [ ] Create family settings screen
 - [ ] Ensure all screens support English and Polish
 
 #### Task 4.3: Android - Child Screens
@@ -578,16 +581,16 @@ buildTypes {
 - [ ] Implement role selection with i18n support
 - [ ] Create family creation screen with i18n support
 - [ ] Create join family screen with i18n support
-- [ ] Implement language switcher (English/Polish)
+- [ ] Implement automatic language detection from system settings
 
 #### Task 5.2: iOS - Parent Screens
 - [ ] Create parent dashboard/home screen (show negative balances clearly)
 - [ ] Create account management screen
-- [ ] Create transaction creation screen (support positive/negative amounts)
+- [ ] Create transaction creation screen (separate Income and Expense options)
 - [ ] Create transaction approval screen
 - [ ] Create scheduled transaction screen (support fixed and percentage-based)
 - [ ] Create transaction history screen
-- [ ] Create family settings screen with language selection
+- [ ] Create family settings screen
 - [ ] Ensure all screens support English and Polish
 
 #### Task 5.3: iOS - Child Screens
@@ -628,7 +631,7 @@ buildTypes {
 #### Task 6.2: Testing Offline Functionality
 - [ ] Test complete offline app flow (end-to-end)
 - [ ] Test negative balance scenarios
-- [ ] Test positive/negative transaction amounts
+- [ ] Test Income and Expense transaction types
 - [ ] Test all features work without network
 - [ ] Test both English and Polish localizations
 - [ ] Performance testing of local database
@@ -667,7 +670,7 @@ buildTypes {
 
 #### Task 8.1: Unit Tests
 - [ ] Write tests for domain use cases
-- [ ] Write tests for business logic validation (negative balances, signed amounts)
+- [ ] Write tests for business logic validation (negative balances, Income/Expense types)
 - [ ] Write tests for data models
 - [ ] Write tests for fail-fast validation
 - [ ] Achieve >80% code coverage for shared code
@@ -682,10 +685,10 @@ buildTypes {
 - [ ] Write UI tests for critical flows (Android)
 - [ ] Write UI tests for critical flows (iOS)
 - [ ] Test user authentication flow
-- [ ] Test transaction creation with positive/negative amounts
+- [ ] Test transaction creation with Income and Expense types
 - [ ] Test negative balance display
 - [ ] Test scheduled transaction creation
-- [ ] Test language switching (English/Polish)
+- [ ] Test language support (English/Polish)
 
 #### Task 8.4: End-to-End Tests
 - [ ] Test complete parent workflow
@@ -840,7 +843,9 @@ buildTypes {
 - **Family**: A group of users (parents and children) who share financial accounts
 - **Parent**: Adult user with full permissions to manage family accounts
 - **Child**: Minor user with limited permissions, requires parent approval
-- **Transaction**: A financial event with signed amount (positive for income, negative for spending)
+- **Transaction**: A financial event that can be Income (adds to balance) or Expense (subtracts from balance)
+- **Income**: A transaction type that increases account balance
+- **Expense**: A transaction type that decreases account balance
 - **Scheduled Transaction**: A recurring transaction that executes automatically (supports fixed amounts or percentage-based)
 - **Negative Balance**: When account balance is below zero, representing loan/credit (overdraft)
 - **Offline-First**: Development approach where app works fully offline before integrating cloud sync
@@ -857,7 +862,8 @@ buildTypes {
 |---------|------|--------|---------|
 | 1.0 | 2025-11-04 | Initial | Initial PRD creation |
 | 1.1 | 2025-11-05 | Updated | Added interest rate education feature; Updated scheduled transactions to support percentage-based calculations; Removed custom frequency intervals; Simplified transaction history to per-account only; Removed filter, search, and export functionality; Removed session timeout and privacy settings; Updated child setup flow; Removed tutorials/onboarding; Removed data models section; Removed staging environment and feature flags; Removed Firebase configuration section; Simplified rules section |
-| 1.2 | 2025-11-05 | Updated | Added fail-fast error handling approach; Added KISS over DRY principle; Implemented offline-first development strategy (Firebase integration after offline functionality); Updated transactions to use signed amounts (positive/negative); Enabled negative balances for loan/credit education; Added multi-language support (English and Polish); Reorganized tasks to reflect offline-first approach; Extended project timeline to 24 weeks |
+| 1.2 | 2025-11-05 | Updated | Added fail-fast error handling approach; Added KISS over DRY principle; Implemented offline-first development strategy (Firebase integration after offline functionality); Enabled negative balances for loan/credit education; Added multi-language support (English and Polish) with automatic system detection; Reorganized tasks to reflect offline-first approach; Extended project timeline to 24 weeks |
+| 1.3 | 2025-11-05 | Updated | Reverted to separate "Add Income" and "Add Expenses" transaction types (instead of signed amounts); Maintained negative balance support for loan/credit teaching; Changed language selection to automatic system detection (removed manual switcher) |
 
 ---
 
