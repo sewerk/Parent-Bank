@@ -24,8 +24,10 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 2. Facilitate controlled financial transactions between parents and children
 3. Teach children financial responsibility through tracked transactions and balance management
 4. Educate children about interest rates and how savings can generate profits over time
-5. Provide a safe environment for children to learn money management without real-world financial risks
-6. Sync family financial data securely across multiple devices using Firebase
+5. Teach concepts of loans and credit through negative balance (overdraft) scenarios
+6. Provide a safe environment for children to learn money management without real-world financial risks
+7. Work fully offline first, then sync family financial data securely across multiple devices using Firebase
+8. Support multiple languages (English and Polish) from the beginning
 
 ## Features
 
@@ -43,12 +45,12 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 - **Delete/Archive Accounts**: Remove or archive child accounts when needed
 
 ### 3. Transaction Management (Parent)
-- **Add Income**: Record income transactions (allowance, gifts, rewards) to child accounts
-- **Add Expenses**: Record expenses from child accounts (purchases, withdrawals)
+- **Add Transactions**: Record transactions with positive amounts (income) or negative amounts (expenses/spending)
 - **Instant Processing**: Parent-created transactions are processed immediately without confirmation
-- **Transaction Details**: Include title, amount, date, category, and optional notes
+- **Transaction Details**: Include title, amount (+ or -), date, category, and optional notes
 - **Review Child Requests**: Approve or deny transaction requests initiated by children
 - **Bulk Transactions**: Apply the same transaction to multiple children simultaneously
+- **Loan/Credit Support**: Allow negative balances to teach children about loans and credit concepts
 
 ### 4. Transaction Management (Child)
 - **Request Transactions**: Submit expense or withdrawal requests to parents
@@ -76,11 +78,13 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 - **Savings Goals**: (Future enhancement) Set and track savings goals
 - **Transaction History**: View personal transaction history
 
-### 8. Firebase Integration
-- **Real-time Sync**: Synchronize family data across all devices in real-time
+### 8. Offline-First with Firebase Integration
+- **Offline-First Design**: App works fully offline as the first implementation step
+- **Local Storage**: All data stored locally using SQLDelight or Realm
+- **Firebase Integration**: Added after offline functionality is complete and stable
+- **Real-time Sync**: Synchronize family data across all devices in real-time once Firebase is integrated
 - **Authentication**: Secure user authentication using Firebase Auth
 - **Cloud Storage**: Store transaction history, family data, and user profiles
-- **Offline Support**: Cache data locally and sync when connection is restored
 - **Data Security**: Encrypt sensitive data and implement proper security rules
 
 ### 9. Notifications
@@ -90,9 +94,10 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 - **In-App Notifications**: Notification center within the app
 
 ### 10. Settings & Configuration
-- **App Settings**: Theme, language, notification preferences
+- **App Settings**: Theme, language selection (English, Polish), notification preferences
 - **Security Settings**: PIN/biometric authentication
 - **Family Settings**: Family name, default currency, family code for joining
+- **Multi-Language Support**: Full app support for English and Polish from launch
 
 ## Usage Flow
 
@@ -345,54 +350,68 @@ buildTypes {
 
 ### Development Guidelines
 
-1. **Architecture & Code Organization**
+1. **Design Principles**
+   - **Fail Fast**: Catch errors early and make them visible; prefer crashing over silent failures or corrupted state
+   - **KISS over DRY**: Keep It Simple, Stupid - prioritize simplicity and readability over Don't Repeat Yourself; duplicate code is better than complex abstractions
+   - **Offline-First**: Build full offline functionality before integrating Firebase sync
+   - **Multi-Language Ready**: Design all UI and content with internationalization in mind from day one
+
+2. **Architecture & Code Organization**
    - Use Kotlin Multiplatform best practices with maximum code sharing in common module
    - Follow clean architecture: separate UI, Domain, and Data layers
    - Use `expect`/`actual` pattern for platform-specific implementations
    - Keep UI layer platform-specific (Compose for Android, SwiftUI for iOS)
    - Use dependency injection and write testable code
 
-2. **Security**
+3. **Security**
    - Store API keys securely using environment variables (never hardcode)
    - Validate all inputs on both client and server side
    - Use Firebase Security Rules effectively
    - Encrypt sensitive data and implement rate limiting
    - Never log sensitive user information or expose internal IDs
 
-3. **Error Handling & Logging**
-   - Implement proper error handling (don't let exceptions crash the app)
-   - Display user-friendly error messages (avoid technical jargon)
+4. **Error Handling & Logging**
+   - Follow fail-fast principle: let the app crash early on critical errors rather than continuing in invalid state
+   - Use crash reporting tools (Firebase Crashlytics) to catch and fix issues quickly
+   - Display user-friendly error messages for recoverable errors (avoid technical jargon)
    - Log important events with appropriate levels
-   - Use crash reporting tools (Firebase Crashlytics)
-   - Never fail silently; provide user feedback
+   - Validate inputs aggressively and fail immediately on invalid data
+   - Never fail silently; provide clear feedback
 
-4. **Performance & Optimization**
+5. **Performance & Optimization**
    - Lazy load data and implement pagination for large lists
    - Cache data locally for offline support
    - Minimize Firebase reads/writes
    - Optimize images and manage memory properly
    - Don't block UI thread with heavy operations
 
-5. **Testing**
+6. **Testing**
    - Write unit tests for business logic (>80% coverage for shared code)
    - Create integration tests for repositories
    - Implement UI tests for critical flows
    - Test edge cases and error scenarios
    - Never deploy untested code
 
-6. **Platform Guidelines & UX**
+7. **Platform Guidelines & UX**
    - Follow Material Design 3 for Android
    - Follow Human Interface Guidelines for iOS
    - Respect platform-specific navigation patterns
    - Implement proper accessibility (TalkBack/VoiceOver)
    - Provide clear loading states and user feedback
 
-7. **Code Quality**
+8. **Code Quality**
    - Use meaningful commit messages and feature branches
    - Review code before merging
    - Document complex logic with clear comments
    - Keep the app simple and intuitive (avoid unnecessary complexity)
    - Maintain up-to-date documentation
+
+9. **Internationalization (i18n)**
+   - Support English and Polish from launch
+   - Use resource files for all user-facing strings
+   - Design UI to accommodate different text lengths
+   - Handle date, time, and currency formats appropriately
+   - Test all features in both languages
 
 ### Business Rules
 
@@ -400,7 +419,7 @@ buildTypes {
    - Parent-initiated transactions process immediately without confirmation
    - Child-initiated transactions require parent approval
    - Only parents can approve/deny transaction requests
-   - All transaction amounts must be positive
+   - Transactions use signed amounts: positive for income, negative for spending
 
 2. **Account Access & Permissions**
    - Parents have full visibility of all child accounts
@@ -408,12 +427,18 @@ buildTypes {
    - Children cannot view siblings' account details
    - Children cannot create scheduled transactions
 
-3. **Data Integrity**
-   - Prevent negative account balances
+3. **Account Balance & Credit**
+   - Balances can become negative (teaching loan/credit concepts)
+   - Negative balance represents money owed (overdraft/credit)
+   - Parents can set optional balance limits per account
+   - Visual indicators should clearly show negative balances
+
+4. **Data Integrity**
    - Maintain complete transaction audit trail
    - Never allow deletion of transaction history
-   - Sync data in real-time across devices
    - Validate all operations before processing
+   - App must work fully offline before implementing sync
+   - Sync data in real-time across devices (once Firebase is integrated)
 
 ## Tasks
 
@@ -427,54 +452,38 @@ buildTypes {
 - [ ] Set up version catalog for dependency management
 - [ ] Initialize Git repository and create .gitignore
 - [ ] Set up CI/CD pipeline (GitHub Actions or similar)
+- [ ] Configure internationalization support (English, Polish)
 
-#### Task 1.2: Firebase Setup
-- [ ] Create Firebase projects (dev, prod)
-- [ ] Add Firebase to Android app
-- [ ] Add Firebase to iOS app
-- [ ] Configure Firebase Authentication
-- [ ] Set up Cloud Firestore database
-- [ ] Define Firestore data structure
-- [ ] Write Firebase Security Rules (initial version)
-- [ ] Set up Firebase Cloud Messaging
-- [ ] Configure Firebase in KMP (expect/actual implementations)
-
-#### Task 1.3: Architecture Setup
+#### Task 1.2: Architecture Setup (Offline-First)
 - [ ] Define project architecture (Clean Architecture)
 - [ ] Create module structure (data, domain, presentation)
 - [ ] Set up dependency injection (Koin or Kotlin Inject)
 - [ ] Create base classes and interfaces
 - [ ] Set up navigation structure (Android: Compose Navigation, iOS: SwiftUI Navigation)
-- [ ] Configure local database (SQLDelight or Realm)
-- [ ] Set up logging framework
+- [ ] Configure local database (SQLDelight or Realm) for offline-first storage
+- [ ] Set up logging framework with fail-fast error handling
+- [ ] Set up i18n resource files for English and Polish
+- [ ] Configure string resources and localization utilities
 
-### Phase 2: Core Features - Data Layer (Week 3-4)
+### Phase 2: Core Features - Data Layer (Week 3-4) - OFFLINE ONLY
 
-#### Task 2.1: Data Models
-- [ ] Create domain models (Family, User, Account, Transaction, ScheduledTransaction)
-- [ ] Create DTOs for Firebase
-- [ ] Implement model mappers
-- [ ] Create enums (UserRole, TransactionType, TransactionStatus, Frequency)
-- [ ] Add data validation logic
+#### Task 2.1: Data Models (Offline-First)
+- [ ] Create domain models (Family, User, Account, Transaction with signed amounts, ScheduledTransaction)
+- [ ] Design Transaction model to support positive (income) and negative (spending) amounts
+- [ ] Design Account model to allow negative balances (loan/credit feature)
+- [ ] Create enums (UserRole, TransactionStatus, Frequency)
+- [ ] Add data validation logic with fail-fast approach
+- [ ] Add i18n keys for all user-facing text in models
 
-#### Task 2.2: Repositories
+#### Task 2.2: Repositories (Local Storage Only)
 - [ ] Create repository interfaces in domain layer
-- [ ] Implement FamilyRepository
-- [ ] Implement UserRepository
-- [ ] Implement AccountRepository
-- [ ] Implement TransactionRepository
-- [ ] Implement ScheduledTransactionRepository
-- [ ] Add error handling and result wrapping
-- [ ] Implement caching strategy
-- [ ] Add offline support
-
-#### Task 2.3: Firebase Integration
-- [ ] Implement Firebase Auth wrapper
-- [ ] Create Firestore data sources
-- [ ] Implement real-time listeners for data sync
-- [ ] Add Firebase Cloud Messaging integration
-- [ ] Implement file upload for profile pictures (Firebase Storage)
-- [ ] Test Firebase connectivity
+- [ ] Implement FamilyRepository with local database
+- [ ] Implement UserRepository with local database
+- [ ] Implement AccountRepository with local database (support negative balances)
+- [ ] Implement TransactionRepository with local database (support signed amounts)
+- [ ] Implement ScheduledTransactionRepository with local database
+- [ ] Add fail-fast error handling and result wrapping
+- [ ] Test all repositories work completely offline
 
 ### Phase 3: Business Logic - Domain Layer (Week 5-6)
 
@@ -510,29 +519,32 @@ buildTypes {
 - [ ] PauseScheduledTransactionUseCase
 
 #### Task 3.5: Business Rules Validation
-- [ ] Implement balance validation (no negative balances)
+- [ ] Implement balance validation (allow negative balances for loan/credit)
 - [ ] Implement permission checks (parent vs child)
 - [ ] Implement transaction approval logic
-- [ ] Add amount validation (positive only)
+- [ ] Add transaction amount validation (support signed amounts: +/-)
 - [ ] Add date validation
+- [ ] Use fail-fast validation (crash on invalid data)
 
 ### Phase 4: UI - Android (Week 7-9)
 
 #### Task 4.1: Android - Authentication & Setup
-- [ ] Create login screen (Compose)
-- [ ] Create registration screen
-- [ ] Implement role selection
-- [ ] Create family creation screen
-- [ ] Create join family screen
+- [ ] Create login screen (Compose) with i18n support
+- [ ] Create registration screen with i18n support
+- [ ] Implement role selection with i18n support
+- [ ] Create family creation screen with i18n support
+- [ ] Create join family screen with i18n support
+- [ ] Implement language switcher (English/Polish)
 
 #### Task 4.2: Android - Parent Screens
-- [ ] Create parent dashboard/home screen
+- [ ] Create parent dashboard/home screen (show negative balances clearly)
 - [ ] Create account management screen
-- [ ] Create transaction creation screen
+- [ ] Create transaction creation screen (support positive/negative amounts)
 - [ ] Create transaction approval screen
 - [ ] Create scheduled transaction screen (support fixed and percentage-based)
 - [ ] Create transaction history screen
-- [ ] Create family settings screen
+- [ ] Create family settings screen with language selection
+- [ ] Ensure all screens support English and Polish
 
 #### Task 4.3: Android - Child Screens
 - [ ] Create child dashboard/home screen
@@ -561,20 +573,22 @@ buildTypes {
 ### Phase 5: UI - iOS (Week 10-12)
 
 #### Task 5.1: iOS - Authentication & Setup
-- [ ] Create login screen (SwiftUI)
-- [ ] Create registration screen
-- [ ] Implement role selection
-- [ ] Create family creation screen
-- [ ] Create join family screen
+- [ ] Create login screen (SwiftUI) with i18n support
+- [ ] Create registration screen with i18n support
+- [ ] Implement role selection with i18n support
+- [ ] Create family creation screen with i18n support
+- [ ] Create join family screen with i18n support
+- [ ] Implement language switcher (English/Polish)
 
 #### Task 5.2: iOS - Parent Screens
-- [ ] Create parent dashboard/home screen
+- [ ] Create parent dashboard/home screen (show negative balances clearly)
 - [ ] Create account management screen
-- [ ] Create transaction creation screen
+- [ ] Create transaction creation screen (support positive/negative amounts)
 - [ ] Create transaction approval screen
 - [ ] Create scheduled transaction screen (support fixed and percentage-based)
 - [ ] Create transaction history screen
-- [ ] Create family settings screen
+- [ ] Create family settings screen with language selection
+- [ ] Ensure all screens support English and Polish
 
 #### Task 5.3: iOS - Child Screens
 - [ ] Create child dashboard/home screen
@@ -600,85 +614,114 @@ buildTypes {
 - [ ] Create ScheduledTransactionViewModel
 - [ ] Create SettingsViewModel
 
-### Phase 6: Features Implementation (Week 13-14)
+### Phase 6: Offline Features Testing (Week 13-14)
 
-#### Task 6.1: Notifications
-- [ ] Implement push notification handling (Android)
-- [ ] Implement push notification handling (iOS)
-- [ ] Create notification service
-- [ ] Implement notification types (transaction request, approval, denial, scheduled reminder)
-- [ ] Create in-app notification center
-- [ ] Test notification delivery
-
-#### Task 6.2: Scheduled Transactions
-- [ ] Implement scheduled transaction execution logic
+#### Task 6.1: Scheduled Transactions (Offline)
+- [ ] Implement scheduled transaction execution logic (offline-only)
 - [ ] Create background job scheduler (Android: WorkManager, iOS: Background Tasks)
-- [ ] Test recurring transaction creation
-- [ ] Implement reminder notifications
+- [ ] Test recurring transaction creation with fixed amounts
+- [ ] Test percentage-based interest calculations
+- [ ] Test with negative balances
+- [ ] Implement local notifications
 - [ ] Add pause/resume functionality
 
-#### Task 6.3: Offline Support
-- [ ] Implement local data caching
-- [ ] Create sync queue for offline actions
-- [ ] Implement conflict resolution
+#### Task 6.2: Testing Offline Functionality
+- [ ] Test complete offline app flow (end-to-end)
+- [ ] Test negative balance scenarios
+- [ ] Test positive/negative transaction amounts
+- [ ] Test all features work without network
+- [ ] Test both English and Polish localizations
+- [ ] Performance testing of local database
+- [ ] Test fail-fast error handling
+
+### Phase 7: Firebase Integration (Week 15-16)
+
+**NOTE: Only start this phase after offline functionality is fully working and tested**
+
+#### Task 7.1: Firebase Setup
+- [ ] Create Firebase projects (dev, prod)
+- [ ] Add Firebase to Android app
+- [ ] Add Firebase to iOS app
+- [ ] Configure Firebase Authentication
+- [ ] Set up Cloud Firestore database
+- [ ] Define Firestore data structure
+- [ ] Write Firebase Security Rules
+- [ ] Configure Firebase in KMP (expect/actual implementations)
+
+#### Task 7.2: Firebase Data Layer
+- [ ] Create DTOs for Firebase
+- [ ] Implement Firestore data sources
+- [ ] Implement real-time listeners for data sync
+- [ ] Add Firebase Cloud Messaging integration
+- [ ] Implement file upload for profile pictures (Firebase Storage)
+
+#### Task 7.3: Sync Implementation
+- [ ] Implement sync queue for offline actions
+- [ ] Implement conflict resolution strategy
 - [ ] Add sync status indicators
-- [ ] Test offline scenarios
+- [ ] Test data synchronization between devices
+- [ ] Test offline/online scenarios
+- [ ] Implement push notifications
 
-### Phase 7: Testing (Week 15-16)
+### Phase 8: Testing (Week 17-18)
 
-#### Task 7.1: Unit Tests
+#### Task 8.1: Unit Tests
 - [ ] Write tests for domain use cases
-- [ ] Write tests for business logic validation
+- [ ] Write tests for business logic validation (negative balances, signed amounts)
 - [ ] Write tests for data models
-- [ ] Write tests for mappers
+- [ ] Write tests for fail-fast validation
 - [ ] Achieve >80% code coverage for shared code
 
-#### Task 7.2: Integration Tests
-- [ ] Test repository implementations
+#### Task 8.2: Integration Tests
+- [ ] Test repository implementations (offline and with Firebase)
 - [ ] Test Firebase integration
 - [ ] Test data synchronization
 - [ ] Test offline/online scenarios
 
-#### Task 7.3: UI Tests
+#### Task 8.3: UI Tests
 - [ ] Write UI tests for critical flows (Android)
 - [ ] Write UI tests for critical flows (iOS)
 - [ ] Test user authentication flow
-- [ ] Test transaction creation and approval flow
+- [ ] Test transaction creation with positive/negative amounts
+- [ ] Test negative balance display
 - [ ] Test scheduled transaction creation
+- [ ] Test language switching (English/Polish)
 
-#### Task 7.4: End-to-End Tests
+#### Task 8.4: End-to-End Tests
 - [ ] Test complete parent workflow
 - [ ] Test complete child workflow
-- [ ] Test multi-device sync
-- [ ] Test edge cases and error scenarios
+- [ ] Test multi-device sync (with Firebase)
+- [ ] Test edge cases and error scenarios with fail-fast
+- [ ] Test loan/credit scenarios (negative balances)
 
-### Phase 8: Polish & Optimization (Week 17-18)
+### Phase 9: Polish & Optimization (Week 19-20)
 
-#### Task 8.1: Performance Optimization
+#### Task 9.1: Performance Optimization
 - [ ] Optimize Firebase queries
+- [ ] Optimize local database queries
 - [ ] Implement pagination for transaction history
 - [ ] Optimize image loading
 - [ ] Profile app performance
 - [ ] Fix memory leaks
 - [ ] Reduce app size
 
-#### Task 8.2: UX Improvements
+#### Task 9.2: UX Improvements
 - [ ] Improve loading states
 - [ ] Add animations and transitions
-- [ ] Improve error messages
-- [ ] Add helpful tooltips
+- [ ] Improve error messages (both languages)
+- [ ] Improve negative balance visual indicators
 - [ ] Conduct usability testing
 - [ ] Implement feedback
 
-#### Task 8.3: Accessibility
+#### Task 9.3: Accessibility
 - [ ] Add content descriptions (Android)
 - [ ] Add accessibility labels (iOS)
-- [ ] Test with TalkBack/VoiceOver
+- [ ] Test with TalkBack/VoiceOver in both languages
 - [ ] Ensure proper contrast ratios
 - [ ] Support dynamic text sizing
 - [ ] Test keyboard navigation
 
-#### Task 8.4: Security Hardening
+#### Task 9.4: Security Hardening
 - [ ] Review and update Firebase Security Rules
 - [ ] Implement rate limiting
 - [ ] Add input sanitization
@@ -686,71 +729,75 @@ buildTypes {
 - [ ] Conduct security audit
 - [ ] Implement certificate pinning (if needed)
 
-### Phase 9: Beta Testing & Refinement (Week 19-20)
+### Phase 10: Beta Testing & Refinement (Week 21-22)
 
-#### Task 9.1: Beta Preparation
+#### Task 10.1: Beta Preparation
 - [ ] Prepare beta builds (Android: Internal Testing, iOS: TestFlight)
-- [ ] Create beta tester documentation
+- [ ] Create beta tester documentation (English and Polish)
 - [ ] Set up feedback collection mechanism
 - [ ] Create bug reporting template
-- [ ] Recruit beta testers
+- [ ] Recruit beta testers (include Polish speakers)
 
-#### Task 9.2: Beta Testing
+#### Task 10.2: Beta Testing
 - [ ] Distribute beta builds
 - [ ] Monitor crash reports
 - [ ] Collect user feedback
 - [ ] Track usage analytics
 - [ ] Identify and prioritize issues
 
-#### Task 9.3: Bug Fixes & Refinements
+#### Task 10.3: Bug Fixes & Refinements
 - [ ] Fix critical bugs
 - [ ] Address user feedback
 - [ ] Improve performance based on analytics
 - [ ] Update documentation
 - [ ] Prepare for public release
 
-### Phase 10: Launch Preparation (Week 21-22)
+### Phase 11: Launch Preparation (Week 23-24)
 
-#### Task 10.1: App Store Preparation
-- [ ] Create app store listings (Google Play)
-- [ ] Create app store listings (App Store)
-- [ ] Prepare screenshots and promotional materials
-- [ ] Write app descriptions
-- [ ] Create privacy policy
-- [ ] Create terms of service
+#### Task 11.1: App Store Preparation
+- [ ] Create app store listings (Google Play) in English and Polish
+- [ ] Create app store listings (App Store) in English and Polish
+- [ ] Prepare screenshots and promotional materials (both languages)
+- [ ] Write app descriptions (both languages)
+- [ ] Create privacy policy (English and Polish)
+- [ ] Create terms of service (English and Polish)
 
-#### Task 10.2: Final Checks
-- [ ] Complete final QA pass
+#### Task 11.2: Final Checks
+- [ ] Complete final QA pass (both languages)
 - [ ] Review all app store requirements
 - [ ] Verify Firebase configuration (production)
 - [ ] Test production builds
+- [ ] Verify offline-first functionality
+- [ ] Test fail-fast error handling in production
 - [ ] Prepare rollback plan
 
-#### Task 10.3: Launch
+#### Task 11.3: Launch
 - [ ] Submit to Google Play
 - [ ] Submit to App Store
 - [ ] Monitor submission review process
-- [ ] Prepare launch announcement
+- [ ] Prepare launch announcement (English and Polish)
 - [ ] Set up monitoring and alerts
 - [ ] Launch app!
 
-### Phase 11: Post-Launch (Ongoing)
+### Phase 12: Post-Launch (Ongoing)
 
-#### Task 11.1: Monitoring
-- [ ] Monitor crash reports
-- [ ] Monitor user reviews
+#### Task 12.1: Monitoring
+- [ ] Monitor crash reports (pay attention to fail-fast crashes)
+- [ ] Monitor user reviews (in both English and Polish)
 - [ ] Track key metrics (DAU, MAU, retention)
 - [ ] Monitor Firebase usage and costs
+- [ ] Monitor offline functionality performance
 - [ ] Set up alerts for critical issues
 
-#### Task 11.2: Maintenance
-- [ ] Respond to user feedback
+#### Task 12.2: Maintenance
+- [ ] Respond to user feedback (in English and Polish)
 - [ ] Fix bugs as they arise
 - [ ] Update dependencies
 - [ ] Address security vulnerabilities
 - [ ] Maintain compatibility with new OS versions
+- [ ] Update translations as needed
 
-#### Task 11.3: Future Enhancements
+#### Task 12.3: Future Enhancements
 - [ ] Plan feature roadmap
 - [ ] Implement savings goals feature
 - [ ] Expand interest/rewards system
@@ -774,10 +821,12 @@ buildTypes {
 - Scheduled transaction usage
 
 ### Technical Metrics
-- App crash rate (<1%)
+- App crash rate (<1%, excluding intentional fail-fast crashes during development)
 - API response time (<500ms)
+- Offline data access time (<100ms)
 - Firebase read/write costs
 - App size (< 50MB)
+- Offline functionality availability (99.9%)
 
 ### Business Metrics
 - User satisfaction (app store ratings >4.0)
@@ -791,8 +840,11 @@ buildTypes {
 - **Family**: A group of users (parents and children) who share financial accounts
 - **Parent**: Adult user with full permissions to manage family accounts
 - **Child**: Minor user with limited permissions, requires parent approval
-- **Transaction**: A financial event (income or expense) that affects an account balance
-- **Scheduled Transaction**: A recurring transaction that executes automatically
+- **Transaction**: A financial event with signed amount (positive for income, negative for spending)
+- **Scheduled Transaction**: A recurring transaction that executes automatically (supports fixed amounts or percentage-based)
+- **Negative Balance**: When account balance is below zero, representing loan/credit (overdraft)
+- **Offline-First**: Development approach where app works fully offline before integrating cloud sync
+- **Fail-Fast**: Error handling strategy where invalid states crash immediately rather than silently continuing
 
 ### References
 - [Kotlin Multiplatform Documentation](https://kotlinlang.org/docs/multiplatform.html)
@@ -805,6 +857,7 @@ buildTypes {
 |---------|------|--------|---------|
 | 1.0 | 2025-11-04 | Initial | Initial PRD creation |
 | 1.1 | 2025-11-05 | Updated | Added interest rate education feature; Updated scheduled transactions to support percentage-based calculations; Removed custom frequency intervals; Simplified transaction history to per-account only; Removed filter, search, and export functionality; Removed session timeout and privacy settings; Updated child setup flow; Removed tutorials/onboarding; Removed data models section; Removed staging environment and feature flags; Removed Firebase configuration section; Simplified rules section |
+| 1.2 | 2025-11-05 | Updated | Added fail-fast error handling approach; Added KISS over DRY principle; Implemented offline-first development strategy (Firebase integration after offline functionality); Updated transactions to use signed amounts (positive/negative); Enabled negative balances for loan/credit education; Added multi-language support (English and Polish); Reorganized tasks to reflect offline-first approach; Extended project timeline to 24 weeks |
 
 ---
 
