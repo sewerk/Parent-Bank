@@ -444,7 +444,7 @@ buildTypes {
 
 ## Tasks
 
-### Phase 1: Project Setup & Foundation (Week 1-2)
+### Phase 1: Project Setup & Foundation
 
 #### Task 1.1: Project Initialization
 - [ ] Create Kotlin Multiplatform project structure
@@ -467,7 +467,7 @@ buildTypes {
 - [ ] Set up i18n resource files for English and Polish
 - [ ] Configure string resources and localization utilities
 
-### Phase 2: Core Features - Data Layer (Week 3-4) - OFFLINE ONLY
+### Phase 2: Core Features - Data Layer (OFFLINE ONLY)
 
 #### Task 2.1: Data Models (Offline-First)
 - [ ] Create domain models (Family, User, Account, Transaction, ScheduledTransaction)
@@ -487,7 +487,7 @@ buildTypes {
 - [ ] Add fail-fast error handling and result wrapping
 - [ ] Test all repositories work completely offline
 
-### Phase 3: Business Logic - Domain Layer (Week 5-6)
+### Phase 3: Business Logic - Domain Layer
 
 #### Task 3.1: Use Cases - Family & User Management
 - [ ] CreateFamilyUseCase
@@ -529,7 +529,7 @@ buildTypes {
 - [ ] Add date validation
 - [ ] Use fail-fast validation (crash on invalid data)
 
-### Phase 4: UI - Android (Week 7-9)
+### Phase 4: UI - Android
 
 #### Task 4.1: Android - Authentication & Setup
 - [ ] Create login screen (Compose) with i18n support
@@ -573,7 +573,7 @@ buildTypes {
 - [ ] Create ScheduledTransactionViewModel
 - [ ] Create SettingsViewModel
 
-### Phase 5: UI - iOS (Week 10-12)
+### Phase 5: UI - iOS
 
 #### Task 5.1: iOS - Authentication & Setup
 - [ ] Create login screen (SwiftUI) with i18n support
@@ -617,7 +617,7 @@ buildTypes {
 - [ ] Create ScheduledTransactionViewModel
 - [ ] Create SettingsViewModel
 
-### Phase 6: Offline Features Testing (Week 13-14)
+### Phase 6: Offline Features Testing
 
 #### Task 6.1: Scheduled Transactions (Offline)
 - [ ] Implement scheduled transaction execution logic (offline-only)
@@ -637,7 +637,7 @@ buildTypes {
 - [ ] Performance testing of local database
 - [ ] Test fail-fast error handling
 
-### Phase 7: Firebase Integration (Week 15-16)
+### Phase 7: Firebase Integration
 
 **NOTE: Only start this phase after offline functionality is fully working and tested**
 
@@ -666,7 +666,7 @@ buildTypes {
 - [ ] Test offline/online scenarios
 - [ ] Implement push notifications
 
-### Phase 8: Testing (Week 17-18)
+### Phase 8: Testing
 
 #### Task 8.1: Unit Tests
 - [ ] Write tests for domain use cases
@@ -697,7 +697,7 @@ buildTypes {
 - [ ] Test edge cases and error scenarios with fail-fast
 - [ ] Test loan/credit scenarios (negative balances)
 
-### Phase 9: Polish & Optimization (Week 19-20)
+### Phase 9: Polish & Optimization
 
 #### Task 9.1: Performance Optimization
 - [ ] Optimize Firebase queries
@@ -732,7 +732,7 @@ buildTypes {
 - [ ] Conduct security audit
 - [ ] Implement certificate pinning (if needed)
 
-### Phase 10: Beta Testing & Refinement (Week 21-22)
+### Phase 10: Beta Testing & Refinement
 
 #### Task 10.1: Beta Preparation
 - [ ] Prepare beta builds (Android: Internal Testing, iOS: TestFlight)
@@ -755,7 +755,7 @@ buildTypes {
 - [ ] Update documentation
 - [ ] Prepare for public release
 
-### Phase 11: Launch Preparation (Week 23-24)
+### Phase 11: Launch Preparation
 
 #### Task 11.1: App Store Preparation
 - [ ] Create app store listings (Google Play) in English and Polish
@@ -862,8 +862,9 @@ buildTypes {
 |---------|------|--------|---------|
 | 1.0 | 2025-11-04 | Initial | Initial PRD creation |
 | 1.1 | 2025-11-05 | Updated | Added interest rate education feature; Updated scheduled transactions to support percentage-based calculations; Removed custom frequency intervals; Simplified transaction history to per-account only; Removed filter, search, and export functionality; Removed session timeout and privacy settings; Updated child setup flow; Removed tutorials/onboarding; Removed data models section; Removed staging environment and feature flags; Removed Firebase configuration section; Simplified rules section |
-| 1.2 | 2025-11-05 | Updated | Added fail-fast error handling approach; Added KISS over DRY principle; Implemented offline-first development strategy (Firebase integration after offline functionality); Enabled negative balances for loan/credit education; Added multi-language support (English and Polish) with automatic system detection; Reorganized tasks to reflect offline-first approach; Extended project timeline to 24 weeks |
+| 1.2 | 2025-11-05 | Updated | Added fail-fast error handling approach; Added KISS over DRY principle; Implemented offline-first development strategy (Firebase integration after offline functionality); Enabled negative balances for loan/credit education; Added multi-language support (English and Polish) with automatic system detection; Reorganized tasks to reflect offline-first approach |
 | 1.3 | 2025-11-05 | Updated | Reverted to separate "Add Income" and "Add Expenses" transaction types (instead of signed amounts); Maintained negative balance support for loan/credit teaching; Changed language selection to automatic system detection (removed manual switcher) |
+| 1.4 | 2025-11-05 | Updated | Removed all time estimates and week numbers from phases; Removed timeline references from documentation; Changed to phase-based organization without date commitments |
 
 ---
 

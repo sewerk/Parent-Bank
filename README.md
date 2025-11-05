@@ -54,7 +54,7 @@ For detailed product requirements, features, and implementation plan, see [PRD.m
 
 ## Project Status
 
-This project is currently in the planning phase. See the [PRD.md](PRD.md) for the complete 24-week implementation roadmap.
+This project is currently in the planning phase. See the [PRD.md](PRD.md) for the complete implementation roadmap organized into phases.
 
 The development follows an offline-first approach, with Firebase integration planned after all core offline functionality is complete and tested.
 
