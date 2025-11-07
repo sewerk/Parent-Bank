@@ -63,6 +63,7 @@ kotlin {
 
         jvmMain.dependencies {
             implementation(libs.sqldelight.driver.jdbc)
+            implementation(libs.sqlite.jdbc)
         }
 
         commonTest.dependencies {
@@ -73,6 +74,7 @@ kotlin {
 
         jvmTest.dependencies {
             implementation(libs.sqldelight.driver.jdbc)
+            implementation(libs.sqlite.jdbc)
         }
     }
 }
