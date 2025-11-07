@@ -10,7 +10,8 @@ import pl.srw.parentbank.db.ParentBankDatabase
  */
 actual class DatabaseDriverFactory {
     actual fun createDriver(): SqlDriver {
-        val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+        // Using in-memory SQLite database for JVM target
+        val driver: SqlDriver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
         ParentBankDatabase.Schema.create(driver)
         return driver
     }
