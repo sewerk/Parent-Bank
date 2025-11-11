@@ -1,6 +1,6 @@
 # Parent Bank
 
-A family financial management mobile application built with Kotlin Multiplatform for Android and iOS.
+A family financial management application built with Kotlin Multiplatform for Android, iOS, and Web.
 
 ## General Project Idea
 
@@ -25,7 +25,7 @@ The application creates a safe environment where children can learn money manage
 - **Offline-First**: App works fully offline before Firebase sync is integrated
 - **Multi-Language**: Full support for English and Polish from launch
 - **Firebase Sync**: Real-time data synchronization across all family devices (added after offline functionality)
-- **Multi-Platform**: Native experience on both Android (Jetpack Compose) and iOS (SwiftUI)
+- **Multi-Platform**: Native experience on Android (Jetpack Compose), iOS (SwiftUI), and Web (Compose for Web)
 
 ### Target Audience
 
@@ -37,6 +37,7 @@ The application creates a safe environment where children can learn money manage
 - **Kotlin Multiplatform (KMP)**: Shared business logic across platforms
 - **Android**: Jetpack Compose, Material Design 3
 - **iOS**: SwiftUI, iOS Human Interface Guidelines
+- **Web**: Compose for Web (Wasm/JS targets)
 - **Backend**: Firebase (Authentication, Firestore, Cloud Messaging) - integrated after offline functionality
 - **Local Storage**: SQLDelight or Realm for offline-first data persistence
 - **Architecture**: Clean Architecture with separation of UI, Domain, and Data layers
@@ -54,6 +55,7 @@ The application creates a safe environment where children can learn money manage
   - `commonMain` - Shared business logic and UI
   - `androidMain` - Android-specific implementations
   - `iosMain` - iOS-specific implementations
+  - `webMain` - Web-specific implementations
 - `/iosApp` - iOS application entry point and SwiftUI code
 
 ## Development
@@ -66,7 +68,7 @@ The application creates a safe environment where children can learn money manage
 ### iOS
 Open `/iosApp` in Xcode and run from there.
 
-### Web (optional)
+### Web
 ```shell
 ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
 ```
