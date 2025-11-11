@@ -1,7 +1,7 @@
 # Parent Bank - Product Requirements Document
 
 ## Project Title
-**Parent Bank** - A Family Financial Management Mobile Application
+**Parent Bank** - A Family Financial Management Application (Mobile & Web)
 
 ## Target Audience
 
@@ -160,7 +160,7 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 ### Technology Stack
 
 #### Kotlin Multiplatform (KMP)
-- **Shared Business Logic**: Core functionality shared between Android and iOS
+- **Shared Business Logic**: Core functionality shared between Android, iOS, and Web
 - **Common Modules**:
   - Domain layer (business logic, use cases)
   - Data layer (repositories, data sources)
@@ -177,6 +177,10 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
   - SwiftUI for UI
   - iOS design guidelines
   - iOS-specific integrations
+- **Web**:
+  - Compose for Web (Wasm/JS targets)
+  - Responsive web design
+  - Browser-specific APIs and storage
 
 #### Backend & Services
 - **Firebase**:
@@ -192,7 +196,8 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 ```
 ┌─────────────────────────────────────┐
 │         Presentation Layer          │
-│  (Android: Compose, iOS: SwiftUI)   │
+│   (Android: Compose, iOS: SwiftUI,  │
+│      Web: Compose for Web)          │
 │         Platform-Specific           │
 └─────────────────────────────────────┘
                   ↕
@@ -223,7 +228,7 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 - Repositories (Interfaces): FamilyRepository, TransactionRepository, UserRepository
 - Firebase Client (expect/actual pattern)
 
-**Platform Modules (androidMain, iosMain)**
+**Platform Modules (androidMain, iosMain, webMain)**
 - UI Implementation
 - Firebase SDK integration (actual implementations)
 - Local database (SQLDelight or Realm)
@@ -361,7 +366,7 @@ buildTypes {
    - Use Kotlin Multiplatform best practices with maximum code sharing in common module
    - Follow clean architecture: separate UI, Domain, and Data layers
    - Use `expect`/`actual` pattern for platform-specific implementations
-   - Keep UI layer platform-specific (Compose for Android, SwiftUI for iOS)
+   - Keep UI layer platform-specific (Compose for Android, SwiftUI for iOS, Compose for Web)
    - Use dependency injection and write testable code
 
 3. **Security**
@@ -396,6 +401,7 @@ buildTypes {
 7. **Platform Guidelines & UX**
    - Follow Material Design 3 for Android
    - Follow Human Interface Guidelines for iOS
+   - Follow responsive web design principles for Web
    - Respect platform-specific navigation patterns
    - Implement proper accessibility (TalkBack/VoiceOver)
    - Provide clear loading states and user feedback
@@ -448,7 +454,7 @@ buildTypes {
 
 #### Task 1.1: Project Initialization
 - [ ] Create Kotlin Multiplatform project structure
-- [ ] Set up commonMain, androidMain, iosMain source sets
+- [ ] Set up commonMain, androidMain, iosMain, webMain source sets
 - [ ] Configure Gradle build files
 - [ ] Add necessary KMP dependencies
 - [ ] Set up version catalog for dependency management
@@ -461,7 +467,7 @@ buildTypes {
 - [ ] Create module structure (data, domain, presentation)
 - [ ] Set up dependency injection (Koin or Kotlin Inject)
 - [ ] Create base classes and interfaces
-- [ ] Set up navigation structure (Android: Compose Navigation, iOS: SwiftUI Navigation)
+- [ ] Set up navigation structure (Android: Compose Navigation, iOS: SwiftUI Navigation, Web: Compose Navigation)
 - [ ] Configure local database (SQLDelight or Realm) for offline-first storage
 - [ ] Set up logging framework with fail-fast error handling
 - [ ] Set up i18n resource files for English and Polish
@@ -617,18 +623,65 @@ buildTypes {
 - [ ] Create ScheduledTransactionViewModel
 - [ ] Create SettingsViewModel
 
-### Phase 6: Offline Features Testing
+### Phase 6: UI - Web
 
-#### Task 6.1: Scheduled Transactions (Offline)
+#### Task 6.1: Web - Authentication & Setup
+- [ ] Create login screen (Compose for Web) with i18n support
+- [ ] Create registration screen with i18n support
+- [ ] Implement role selection with i18n support
+- [ ] Create family creation screen with i18n support
+- [ ] Create join family screen with i18n support
+- [ ] Implement automatic language detection from browser settings
+
+#### Task 6.2: Web - Parent Screens
+- [ ] Create parent dashboard/home screen (show negative balances clearly)
+- [ ] Create account management screen
+- [ ] Create transaction creation screen (separate Income and Expense options)
+- [ ] Create transaction approval screen
+- [ ] Create scheduled transaction screen (support fixed and percentage-based)
+- [ ] Create transaction history screen
+- [ ] Create family settings screen
+- [ ] Ensure all screens support English and Polish
+- [ ] Implement responsive layouts for different screen sizes
+
+#### Task 6.3: Web - Child Screens
+- [ ] Create child dashboard/home screen
+- [ ] Create account view screen
+- [ ] Create transaction request screen
+- [ ] Create transaction history screen
+- [ ] Create pending requests screen
+- [ ] Ensure responsive design for tablets and desktops
+
+#### Task 6.4: Web - Common UI
+- [ ] Create navigation structure
+- [ ] Create app theme (responsive web design)
+- [ ] Create reusable composables (buttons, cards, inputs)
+- [ ] Create loading states
+- [ ] Create error states
+- [ ] Implement notifications UI
+- [ ] Create settings screen
+- [ ] Add mobile-first responsive breakpoints
+
+#### Task 6.5: Web - ViewModels
+- [ ] Create AuthViewModel
+- [ ] Create ParentDashboardViewModel
+- [ ] Create ChildDashboardViewModel
+- [ ] Create TransactionViewModel
+- [ ] Create ScheduledTransactionViewModel
+- [ ] Create SettingsViewModel
+
+### Phase 7: Offline Features Testing
+
+#### Task 7.1: Scheduled Transactions (Offline)
 - [ ] Implement scheduled transaction execution logic (offline-only)
-- [ ] Create background job scheduler (Android: WorkManager, iOS: Background Tasks)
+- [ ] Create background job scheduler (Android: WorkManager, iOS: Background Tasks, Web: Service Workers/Firebase Cloud Functions)
 - [ ] Test recurring transaction creation with fixed amounts
 - [ ] Test percentage-based interest calculations
 - [ ] Test with negative balances
 - [ ] Implement local notifications
 - [ ] Add pause/resume functionality
 
-#### Task 6.2: Testing Offline Functionality
+#### Task 7.2: Testing Offline Functionality
 - [ ] Test complete offline app flow (end-to-end)
 - [ ] Test negative balance scenarios
 - [ ] Test Income and Expense transaction types
@@ -637,28 +690,29 @@ buildTypes {
 - [ ] Performance testing of local database
 - [ ] Test fail-fast error handling
 
-### Phase 7: Firebase Integration
+### Phase 8: Firebase Integration
 
 **NOTE: Only start this phase after offline functionality is fully working and tested**
 
-#### Task 7.1: Firebase Setup
+#### Task 8.1: Firebase Setup
 - [ ] Create Firebase projects (dev, prod)
 - [ ] Add Firebase to Android app
 - [ ] Add Firebase to iOS app
+- [ ] Add Firebase to Web app
 - [ ] Configure Firebase Authentication
 - [ ] Set up Cloud Firestore database
 - [ ] Define Firestore data structure
 - [ ] Write Firebase Security Rules
 - [ ] Configure Firebase in KMP (expect/actual implementations)
 
-#### Task 7.2: Firebase Data Layer
+#### Task 8.2: Firebase Data Layer
 - [ ] Create DTOs for Firebase
 - [ ] Implement Firestore data sources
 - [ ] Implement real-time listeners for data sync
 - [ ] Add Firebase Cloud Messaging integration
 - [ ] Implement file upload for profile pictures (Firebase Storage)
 
-#### Task 7.3: Sync Implementation
+#### Task 8.3: Sync Implementation
 - [ ] Implement sync queue for offline actions
 - [ ] Implement conflict resolution strategy
 - [ ] Add sync status indicators
@@ -666,40 +720,41 @@ buildTypes {
 - [ ] Test offline/online scenarios
 - [ ] Implement push notifications
 
-### Phase 8: Testing
+### Phase 9: Testing
 
-#### Task 8.1: Unit Tests
+#### Task 9.1: Unit Tests
 - [ ] Write tests for domain use cases
 - [ ] Write tests for business logic validation (negative balances, Income/Expense types)
 - [ ] Write tests for data models
 - [ ] Write tests for fail-fast validation
 - [ ] Achieve >80% code coverage for shared code
 
-#### Task 8.2: Integration Tests
+#### Task 9.2: Integration Tests
 - [ ] Test repository implementations (offline and with Firebase)
 - [ ] Test Firebase integration
 - [ ] Test data synchronization
 - [ ] Test offline/online scenarios
 
-#### Task 8.3: UI Tests
+#### Task 9.3: UI Tests
 - [ ] Write UI tests for critical flows (Android)
 - [ ] Write UI tests for critical flows (iOS)
+- [ ] Write UI tests for critical flows (Web)
 - [ ] Test user authentication flow
 - [ ] Test transaction creation with Income and Expense types
 - [ ] Test negative balance display
 - [ ] Test scheduled transaction creation
 - [ ] Test language support (English/Polish)
 
-#### Task 8.4: End-to-End Tests
+#### Task 9.4: End-to-End Tests
 - [ ] Test complete parent workflow
 - [ ] Test complete child workflow
 - [ ] Test multi-device sync (with Firebase)
 - [ ] Test edge cases and error scenarios with fail-fast
 - [ ] Test loan/credit scenarios (negative balances)
 
-### Phase 9: Polish & Optimization
+### Phase 10: Polish & Optimization
 
-#### Task 9.1: Performance Optimization
+#### Task 10.1: Performance Optimization
 - [ ] Optimize Firebase queries
 - [ ] Optimize local database queries
 - [ ] Implement pagination for transaction history
@@ -708,7 +763,7 @@ buildTypes {
 - [ ] Fix memory leaks
 - [ ] Reduce app size
 
-#### Task 9.2: UX Improvements
+#### Task 10.2: UX Improvements
 - [ ] Improve loading states
 - [ ] Add animations and transitions
 - [ ] Improve error messages (both languages)
@@ -716,15 +771,16 @@ buildTypes {
 - [ ] Conduct usability testing
 - [ ] Implement feedback
 
-#### Task 9.3: Accessibility
+#### Task 10.3: Accessibility
 - [ ] Add content descriptions (Android)
 - [ ] Add accessibility labels (iOS)
-- [ ] Test with TalkBack/VoiceOver in both languages
+- [ ] Add ARIA labels (Web)
+- [ ] Test with TalkBack/VoiceOver/screen readers in both languages
 - [ ] Ensure proper contrast ratios
 - [ ] Support dynamic text sizing
 - [ ] Test keyboard navigation
 
-#### Task 9.4: Security Hardening
+#### Task 10.4: Security Hardening
 - [ ] Review and update Firebase Security Rules
 - [ ] Implement rate limiting
 - [ ] Add input sanitization
@@ -732,40 +788,41 @@ buildTypes {
 - [ ] Conduct security audit
 - [ ] Implement certificate pinning (if needed)
 
-### Phase 10: Beta Testing & Refinement
+### Phase 11: Beta Testing & Refinement
 
-#### Task 10.1: Beta Preparation
+#### Task 11.1: Beta Preparation
 - [ ] Prepare beta builds (Android: Internal Testing, iOS: TestFlight)
 - [ ] Create beta tester documentation (English and Polish)
 - [ ] Set up feedback collection mechanism
 - [ ] Create bug reporting template
 - [ ] Recruit beta testers (include Polish speakers)
 
-#### Task 10.2: Beta Testing
+#### Task 11.2: Beta Testing
 - [ ] Distribute beta builds
 - [ ] Monitor crash reports
 - [ ] Collect user feedback
 - [ ] Track usage analytics
 - [ ] Identify and prioritize issues
 
-#### Task 10.3: Bug Fixes & Refinements
+#### Task 11.3: Bug Fixes & Refinements
 - [ ] Fix critical bugs
 - [ ] Address user feedback
 - [ ] Improve performance based on analytics
 - [ ] Update documentation
 - [ ] Prepare for public release
 
-### Phase 11: Launch Preparation
+### Phase 12: Launch Preparation
 
-#### Task 11.1: App Store Preparation
+#### Task 12.1: App Store Preparation
 - [ ] Create app store listings (Google Play) in English and Polish
 - [ ] Create app store listings (App Store) in English and Polish
+- [ ] Set up web hosting and domain for Web version
 - [ ] Prepare screenshots and promotional materials (both languages)
 - [ ] Write app descriptions (both languages)
 - [ ] Create privacy policy (English and Polish)
 - [ ] Create terms of service (English and Polish)
 
-#### Task 11.2: Final Checks
+#### Task 12.2: Final Checks
 - [ ] Complete final QA pass (both languages)
 - [ ] Review all app store requirements
 - [ ] Verify Firebase configuration (production)
@@ -774,17 +831,18 @@ buildTypes {
 - [ ] Test fail-fast error handling in production
 - [ ] Prepare rollback plan
 
-#### Task 11.3: Launch
+#### Task 12.3: Launch
 - [ ] Submit to Google Play
 - [ ] Submit to App Store
+- [ ] Deploy Web version to production
 - [ ] Monitor submission review process
 - [ ] Prepare launch announcement (English and Polish)
 - [ ] Set up monitoring and alerts
 - [ ] Launch app!
 
-### Phase 12: Post-Launch (Ongoing)
+### Phase 13: Post-Launch (Ongoing)
 
-#### Task 12.1: Monitoring
+#### Task 13.1: Monitoring
 - [ ] Monitor crash reports (pay attention to fail-fast crashes)
 - [ ] Monitor user reviews (in both English and Polish)
 - [ ] Track key metrics (DAU, MAU, retention)
@@ -792,7 +850,7 @@ buildTypes {
 - [ ] Monitor offline functionality performance
 - [ ] Set up alerts for critical issues
 
-#### Task 12.2: Maintenance
+#### Task 13.2: Maintenance
 - [ ] Respond to user feedback (in English and Polish)
 - [ ] Fix bugs as they arise
 - [ ] Update dependencies
@@ -800,7 +858,7 @@ buildTypes {
 - [ ] Maintain compatibility with new OS versions
 - [ ] Update translations as needed
 
-#### Task 12.3: Future Enhancements
+#### Task 13.3: Future Enhancements
 - [ ] Plan feature roadmap
 - [ ] Implement savings goals feature
 - [ ] Expand interest/rewards system
