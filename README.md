@@ -1,63 +1,63 @@
-# Parent Bank
+This is a Kotlin Multiplatform project targeting Android, iOS, Web.
 
-A family financial management mobile application built with Kotlin Multiplatform for Android and iOS.
+* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
+  It contains several subfolders:
+  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
+  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
+    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
+    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
+    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
+    folder is the appropriate location.
 
-## General Project Idea
+* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
+  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
 
-Parent Bank is a secure, intuitive, and educational platform designed to help families manage children's finances. The app empowers parents to control and oversee their children's financial activities while giving children visibility and limited autonomy in managing their own accounts.
+### Build and Run Android Application
 
-### Core Concept
+To build and run the development version of the Android app, use the run configuration from the run widget
+in your IDE’s toolbar or build it directly from the terminal:
+- on macOS/Linux
+  ```shell
+  ./gradlew :composeApp:assembleDebug
+  ```
+- on Windows
+  ```shell
+  .\gradlew.bat :composeApp:assembleDebug
+  ```
 
-The application creates a safe environment where children can learn money management without real-world financial risks. Parents can create virtual bank accounts for their children, manage transactions, set up allowances, and even teach concepts like interest rates and savings through percentage-based scheduled transactions.
+### Build and Run Web Application
 
-### Key Features
+To build and run the development version of the web app, use the run configuration from the run widget
+in your IDE's toolbar or run it directly from the terminal:
+- for the Wasm target (faster, modern browsers):
+  - on macOS/Linux
+    ```shell
+    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
+    ```
+  - on Windows
+    ```shell
+    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
+    ```
+- for the JS target (slower, supports older browsers):
+  - on macOS/Linux
+    ```shell
+    ./gradlew :composeApp:jsBrowserDevelopmentRun
+    ```
+  - on Windows
+    ```shell
+    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
+    ```
 
-- **Family Management**: Create family units with multiple parents and children
-- **Account Management**: Parents create and manage individual accounts for each child
-- **Transaction Control**:
-  - Parents can add Income (increases balance) and Expenses (decreases balance)
-  - Children request transactions that require parent approval
-  - Support for negative balances to teach loan/credit concepts
-- **Scheduled Transactions**: Set up recurring transactions (allowances, interest payments) with support for both fixed amounts and percentage-based calculations
-- **Interest Education**: Teach children how savings generate profits through automated interest payments
-- **Loan/Credit Education**: Allow negative balances to teach children about loans and overdrafts
-- **Transaction History**: Per-account transaction tracking
-- **Offline-First**: App works fully offline before Firebase sync is integrated
-- **Multi-Language**: Full support for English and Polish from launch
-- **Firebase Sync**: Real-time data synchronization across all family devices (added after offline functionality)
-- **Multi-Platform**: Native experience on both Android (Jetpack Compose) and iOS (SwiftUI)
+### Build and Run iOS Application
 
-### Target Audience
+To build and run the development version of the iOS app, use the run configuration from the run widget
+in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
 
-- **Parents/Guardians**: Adults who want to teach their children about money management
-- **Children/Teens**: Ages 6-17 learning financial responsibility under parental supervision
+---
 
-### Technology Stack
+Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
+[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
+[Kotlin/Wasm](https://kotl.in/wasm/)…
 
-- **Kotlin Multiplatform (KMP)**: Shared business logic across platforms
-- **Android**: Jetpack Compose, Material Design 3
-- **iOS**: SwiftUI, iOS Human Interface Guidelines
-- **Backend**: Firebase (Authentication, Firestore, Cloud Messaging) - integrated after offline functionality
-- **Local Storage**: SQLDelight or Realm for offline-first data persistence
-- **Architecture**: Clean Architecture with separation of UI, Domain, and Data layers
-
-### Development Philosophy
-
-- **Offline-First**: The app is built to work completely offline before any cloud sync is added
-- **Fail-Fast**: Errors crash early rather than silently corrupting state
-- **KISS over DRY**: Simplicity and readability prioritized over code reusability
-- **Multi-Language from Day 1**: English and Polish support built in from the start
-
-## Documentation
-
-For detailed product requirements, features, and implementation plan, see [PRD.md](PRD.md).
-
-## Project Status
-
-This project is currently in the planning phase. See the [PRD.md](PRD.md) for the complete implementation roadmap organized into phases.
-
-The development follows an offline-first approach, with Firebase integration planned after all core offline functionality is complete and tested.
-
-## License
-
-TBD
+We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
+If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
