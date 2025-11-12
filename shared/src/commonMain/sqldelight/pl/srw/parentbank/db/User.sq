@@ -1,0 +1,36 @@
+CREATE TABLE UserEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    familyId TEXT NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT,
+    role TEXT NOT NULL,
+    age INTEGER,
+    profilePictureUrl TEXT,
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL,
+    FOREIGN KEY (familyId) REFERENCES FamilyEntity(id) ON DELETE CASCADE
+);
+
+CREATE INDEX user_familyId ON UserEntity(familyId);
+
+-- Queries
+selectAll:
+SELECT * FROM UserEntity;
+
+selectById:
+SELECT * FROM UserEntity WHERE id = ?;
+
+selectByFamilyId:
+SELECT * FROM UserEntity WHERE familyId = ?;
+
+insert:
+INSERT OR REPLACE INTO UserEntity(id, familyId, name, email, role, age, profilePictureUrl, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE UserEntity
+SET name = ?, email = ?, age = ?, profilePictureUrl = ?, updatedAt = ?
+WHERE id = ?;
+
+deleteById:
+DELETE FROM UserEntity WHERE id = ?;

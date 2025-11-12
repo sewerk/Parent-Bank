@@ -1,0 +1,30 @@
+CREATE TABLE FamilyEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    familyCode TEXT NOT NULL UNIQUE,
+    currency TEXT NOT NULL,
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+-- Queries
+selectAll:
+SELECT * FROM FamilyEntity;
+
+selectById:
+SELECT * FROM FamilyEntity WHERE id = ?;
+
+selectByCode:
+SELECT * FROM FamilyEntity WHERE familyCode = ?;
+
+insert:
+INSERT OR REPLACE INTO FamilyEntity(id, name, familyCode, currency, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE FamilyEntity
+SET name = ?, currency = ?, updatedAt = ?
+WHERE id = ?;
+
+deleteById:
+DELETE FROM FamilyEntity WHERE id = ?;

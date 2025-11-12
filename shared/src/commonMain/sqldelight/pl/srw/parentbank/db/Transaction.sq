@@ -1,0 +1,62 @@
+CREATE TABLE TransactionEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    accountId TEXT NOT NULL,
+    familyId TEXT NOT NULL,
+    type TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    category TEXT,
+    notes TEXT,
+    status TEXT NOT NULL,
+    initiatedBy TEXT NOT NULL,
+    processedBy TEXT,
+    date INTEGER NOT NULL,
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL,
+    FOREIGN KEY (accountId) REFERENCES AccountEntity(id) ON DELETE CASCADE,
+    FOREIGN KEY (familyId) REFERENCES FamilyEntity(id) ON DELETE CASCADE,
+    FOREIGN KEY (initiatedBy) REFERENCES UserEntity(id),
+    FOREIGN KEY (processedBy) REFERENCES UserEntity(id)
+);
+
+CREATE INDEX transaction_accountId ON TransactionEntity(accountId);
+CREATE INDEX transaction_familyId ON TransactionEntity(familyId);
+CREATE INDEX transaction_status ON TransactionEntity(status);
+CREATE INDEX transaction_date ON TransactionEntity(date);
+
+-- Queries
+selectAll:
+SELECT * FROM TransactionEntity;
+
+selectById:
+SELECT * FROM TransactionEntity WHERE id = ?;
+
+selectByAccountId:
+SELECT * FROM TransactionEntity
+WHERE accountId = ?
+ORDER BY date DESC;
+
+selectPendingByFamilyId:
+SELECT * FROM TransactionEntity
+WHERE familyId = ? AND status = 'PENDING'
+ORDER BY createdAt DESC;
+
+insert:
+INSERT OR REPLACE INTO TransactionEntity(
+    id, accountId, familyId, type, amount, title, category, notes,
+    status, initiatedBy, processedBy, date, createdAt, updatedAt
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateStatus:
+UPDATE TransactionEntity
+SET status = ?, processedBy = ?, updatedAt = ?
+WHERE id = ?;
+
+update:
+UPDATE TransactionEntity
+SET type = ?, amount = ?, title = ?, category = ?, notes = ?, status = ?, updatedAt = ?
+WHERE id = ?;
+
+deleteById:
+DELETE FROM TransactionEntity WHERE id = ?;
