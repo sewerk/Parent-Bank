@@ -1,7 +1,7 @@
 package pl.srw.parentbank.data.datasource
 
 import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import app.cash.sqldelight.driver.jdbc.JdbcSqliteDriver
 import pl.srw.parentbank.db.ParentBankDatabase
 
 /**
