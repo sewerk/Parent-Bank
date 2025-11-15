@@ -9,7 +9,8 @@ import org.koin.dsl.module
 fun appModule(): List<Module> = listOf(
     platformModule(),
     DataModule.dataModule(),
-    DomainModule.domainModule()
+    DomainModule.domainModule(),
+    PresentationModule.presentationModule()
 )
 
 /**
@@ -18,11 +19,24 @@ fun appModule(): List<Module> = listOf(
 internal object DataModule {
     /**
      * Data layer module for repositories and data sources.
-     * Will be populated as we implement repositories.
      */
     fun dataModule() = module {
-        // Repository implementations will be added here
-        // Example: single<FamilyRepository> { FamilyRepositoryImpl(get()) }
+        // Repository implementations
+        single<pl.srw.parentbank.domain.repository.FamilyRepository> {
+            pl.srw.parentbank.data.repository.FamilyRepositoryImpl(get())
+        }
+        single<pl.srw.parentbank.domain.repository.UserRepository> {
+            pl.srw.parentbank.data.repository.UserRepositoryImpl(get())
+        }
+        single<pl.srw.parentbank.domain.repository.AccountRepository> {
+            pl.srw.parentbank.data.repository.AccountRepositoryImpl(get())
+        }
+        single<pl.srw.parentbank.domain.repository.TransactionRepository> {
+            pl.srw.parentbank.data.repository.TransactionRepositoryImpl(get())
+        }
+        single<pl.srw.parentbank.domain.repository.ScheduledTransactionRepository> {
+            pl.srw.parentbank.data.repository.ScheduledTransactionRepositoryImpl(get())
+        }
     }
 }
 
@@ -32,10 +46,41 @@ internal object DataModule {
 internal object DomainModule {
     /**
      * Domain layer module for use cases.
-     * Will be populated as we implement use cases.
      */
     fun domainModule() = module {
-        // Use cases will be added here
-        // Example: factory { CreateFamilyUseCase(get()) }
+        // Family use cases
+        factory { pl.srw.parentbank.domain.usecase.family.CreateFamilyUseCase(get()) }
+        factory { pl.srw.parentbank.domain.usecase.family.JoinFamilyUseCase(get()) }
+
+        // User use cases
+        factory { pl.srw.parentbank.domain.usecase.user.CreateUserUseCase(get()) }
+
+        // Account use cases
+        factory { pl.srw.parentbank.domain.usecase.account.CreateAccountUseCase(get()) }
+
+        // Transaction use cases
+        factory { pl.srw.parentbank.domain.usecase.transaction.CreateTransactionUseCase(get(), get(), get()) }
+        factory { pl.srw.parentbank.domain.usecase.transaction.ApproveTransactionUseCase(get(), get(), get()) }
+        factory { pl.srw.parentbank.domain.usecase.transaction.DenyTransactionUseCase(get(), get()) }
+
+        // Scheduled transaction use cases
+        factory { pl.srw.parentbank.domain.usecase.scheduled.CreateScheduledTransactionUseCase(get(), get()) }
+        factory { pl.srw.parentbank.domain.usecase.scheduled.ExecuteScheduledTransactionsUseCase(get(), get(), get()) }
+    }
+}
+
+/**
+ * Presentation layer module container.
+ */
+internal object PresentationModule {
+    /**
+     * Presentation layer module for ViewModels.
+     */
+    fun presentationModule() = module {
+        // ViewModels
+        factory { pl.srw.parentbank.presentation.family.FamilyViewModel(get(), get()) }
+        factory { pl.srw.parentbank.presentation.user.UserViewModel(get(), get()) }
+        factory { pl.srw.parentbank.presentation.dashboard.DashboardViewModel(get(), get(), get()) }
+        factory { pl.srw.parentbank.presentation.transaction.TransactionViewModel(get(), get(), get()) }
     }
 }
