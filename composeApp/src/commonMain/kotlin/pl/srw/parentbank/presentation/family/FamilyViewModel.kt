@@ -50,7 +50,7 @@ class FamilyViewModel(
             state = state.copy(isLoading = true, error = null)
 
             val params = CreateFamilyUseCase.Params(
-                id = "family_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}",
+                id = "family_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}",
                 name = state.familyName,
                 currency = state.currency
             )

@@ -42,7 +42,7 @@ class UserViewModel(
         viewModelScope.launch {
             state = state.copy(isLoading = true, error = null)
 
-            val userId = "user_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}"
+            val userId = "user_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}"
             val params = CreateUserUseCase.Params(
                 id = userId,
                 familyId = familyId,
@@ -76,7 +76,7 @@ class UserViewModel(
 
     private suspend fun createAccountForChild(user: User, familyId: String) {
         val accountParams = CreateAccountUseCase.Params(
-            id = "account_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}",
+            id = "account_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}",
             childId = user.id,
             familyId = familyId
         )

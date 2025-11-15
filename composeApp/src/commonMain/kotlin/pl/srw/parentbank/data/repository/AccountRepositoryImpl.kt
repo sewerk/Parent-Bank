@@ -1,4 +1,5 @@
 package pl.srw.parentbank.data.repository
+import kotlinx.datetime.Clock
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
@@ -105,7 +106,7 @@ class AccountRepositoryImpl(
 
     override suspend fun updateBalance(accountId: String, newBalance: Long): Outcome<Account> = withContext(Dispatchers.Default) {
         try {
-            val currentTime = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+            val currentTime = Clock.System.now().toEpochMilliseconds()
             queries.updateBalance(
                 balance = newBalance,
                 updatedAt = currentTime,
@@ -129,7 +130,7 @@ class AccountRepositoryImpl(
 
     override suspend fun deactivateAccount(id: String): Outcome<Unit> = withContext(Dispatchers.Default) {
         try {
-            val currentTime = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+            val currentTime = Clock.System.now().toEpochMilliseconds()
             queries.deactivate(
                 updatedAt = currentTime,
                 id = id

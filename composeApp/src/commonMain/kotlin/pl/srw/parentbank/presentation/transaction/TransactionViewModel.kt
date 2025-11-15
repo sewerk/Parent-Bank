@@ -59,7 +59,7 @@ class TransactionViewModel(
             state = state.copy(isLoading = true, error = null)
 
             val params = CreateTransactionUseCase.Params(
-                id = "tx_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}",
+                id = "tx_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}",
                 accountId = accountId,
                 type = state.type,
                 amount = state.amountCents,

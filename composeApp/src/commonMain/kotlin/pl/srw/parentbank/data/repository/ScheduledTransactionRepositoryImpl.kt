@@ -1,4 +1,5 @@
 package pl.srw.parentbank.data.repository
+import kotlinx.datetime.Clock
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
@@ -134,7 +135,7 @@ class ScheduledTransactionRepositoryImpl(
 
     override suspend fun pauseScheduledTransaction(id: String): Outcome<ScheduledTransaction> = withContext(Dispatchers.Default) {
         try {
-            val currentTime = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+            val currentTime = Clock.System.now().toEpochMilliseconds()
             queries.pause(
                 updatedAt = currentTime,
                 id = id
@@ -157,7 +158,7 @@ class ScheduledTransactionRepositoryImpl(
 
     override suspend fun resumeScheduledTransaction(id: String): Outcome<ScheduledTransaction> = withContext(Dispatchers.Default) {
         try {
-            val currentTime = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+            val currentTime = Clock.System.now().toEpochMilliseconds()
             queries.resume(
                 updatedAt = currentTime,
                 id = id

@@ -1,4 +1,5 @@
 package pl.srw.parentbank.data.repository
+import kotlinx.datetime.Clock
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
@@ -114,7 +115,7 @@ class TransactionRepositoryImpl(
         processedBy: String
     ): Outcome<Transaction> = withContext(Dispatchers.Default) {
         try {
-            val currentTime = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+            val currentTime = Clock.System.now().toEpochMilliseconds()
             queries.updateStatus(
                 status = status.name,
                 processedBy = processedBy,
