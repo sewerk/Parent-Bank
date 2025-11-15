@@ -21,7 +21,7 @@ class TransactionRepositoryImpl(
     private val database: ParentBankDatabase
 ) : TransactionRepository {
 
-    private val queries = database.transactionEntityQueries
+    private val queries = database.transactionQueries
 
     override suspend fun createTransaction(transaction: Transaction): Outcome<Transaction> = withContext(Dispatchers.Default) {
         try {

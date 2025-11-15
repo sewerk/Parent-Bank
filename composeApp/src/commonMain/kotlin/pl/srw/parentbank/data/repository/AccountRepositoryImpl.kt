@@ -21,7 +21,7 @@ class AccountRepositoryImpl(
     private val database: ParentBankDatabase
 ) : AccountRepository {
 
-    private val queries = database.accountEntityQueries
+    private val queries = database.accountQueries
 
     override suspend fun createAccount(account: Account): Outcome<Account> = withContext(Dispatchers.Default) {
         try {

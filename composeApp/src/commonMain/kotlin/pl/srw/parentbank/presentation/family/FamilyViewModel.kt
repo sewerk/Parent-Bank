@@ -1,4 +1,5 @@
 package pl.srw.parentbank.presentation.family
+import kotlinx.datetime.Clock
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,7 +50,7 @@ class FamilyViewModel(
             state = state.copy(isLoading = true, error = null)
 
             val params = CreateFamilyUseCase.Params(
-                id = "family_${System.currentTimeMillis()}_${Random.nextInt(10000)}",
+                id = "family_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}",
                 name = state.familyName,
                 currency = state.currency
             )

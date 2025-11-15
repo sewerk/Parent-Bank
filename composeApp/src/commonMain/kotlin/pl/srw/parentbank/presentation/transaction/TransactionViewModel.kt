@@ -1,4 +1,5 @@
 package pl.srw.parentbank.presentation.transaction
+import kotlinx.datetime.Clock
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,7 +59,7 @@ class TransactionViewModel(
             state = state.copy(isLoading = true, error = null)
 
             val params = CreateTransactionUseCase.Params(
-                id = "tx_${System.currentTimeMillis()}_${Random.nextInt(10000)}",
+                id = "tx_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}",
                 accountId = accountId,
                 type = state.type,
                 amount = state.amountCents,

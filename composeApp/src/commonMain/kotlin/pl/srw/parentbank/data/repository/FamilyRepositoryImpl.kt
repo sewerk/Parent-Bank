@@ -20,7 +20,7 @@ class FamilyRepositoryImpl(
     private val database: ParentBankDatabase
 ) : FamilyRepository {
 
-    private val queries = database.familyEntityQueries
+    private val queries = database.familyQueries
 
     override suspend fun createFamily(family: Family): Outcome<Family> = withContext(Dispatchers.Default) {
         try {

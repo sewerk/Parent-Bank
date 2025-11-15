@@ -22,7 +22,7 @@ class ScheduledTransactionRepositoryImpl(
     private val database: ParentBankDatabase
 ) : ScheduledTransactionRepository {
 
-    private val queries = database.scheduledTransactionEntityQueries
+    private val queries = database.scheduledTransactionQueries
 
     override suspend fun createScheduledTransaction(scheduledTransaction: ScheduledTransaction): Outcome<ScheduledTransaction> = withContext(Dispatchers.Default) {
         try {

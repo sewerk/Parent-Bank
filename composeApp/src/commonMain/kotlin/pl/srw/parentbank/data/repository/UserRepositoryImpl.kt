@@ -21,7 +21,7 @@ class UserRepositoryImpl(
     private val database: ParentBankDatabase
 ) : UserRepository {
 
-    private val queries = database.userEntityQueries
+    private val queries = database.userQueries
 
     override suspend fun createUser(user: User): Outcome<User> = withContext(Dispatchers.Default) {
         try {
