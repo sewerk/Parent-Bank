@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 import pl.srw.parentbank.domain.model.TransactionType
 import pl.srw.parentbank.domain.model.UserRole
@@ -24,20 +23,18 @@ import pl.srw.parentbank.presentation.user.UserViewModel
 
 @Composable
 fun ParentBankApp() {
-    KoinContext {
-        MaterialTheme {
-            val navigator = rememberNavigator()
+    MaterialTheme {
+        val navigator = rememberNavigator()
 
-            when (val screen = navigator.currentScreen) {
-                is Screen.Welcome -> WelcomeScreen(navigator)
-                is Screen.CreateFamily -> CreateFamilyScreen(navigator)
-                is Screen.JoinFamily -> JoinFamilyScreen(navigator)
-                is Screen.CreateUser -> CreateUserScreen(navigator, screen.familyId)
-                is Screen.ParentDashboard -> ParentDashboardScreen(navigator, screen.userId, screen.familyId)
-                is Screen.ChildDashboard -> ChildDashboardScreen(navigator, screen.userId, screen.familyId)
-                is Screen.CreateTransaction -> CreateTransactionScreen(navigator, screen.accountId, screen.userId)
-                is Screen.PendingTransactions -> PendingTransactionsScreen(navigator, screen.familyId, screen.userId)
-            }
+        when (val screen = navigator.currentScreen) {
+            is Screen.Welcome -> WelcomeScreen(navigator)
+            is Screen.CreateFamily -> CreateFamilyScreen(navigator)
+            is Screen.JoinFamily -> JoinFamilyScreen(navigator)
+            is Screen.CreateUser -> CreateUserScreen(navigator, screen.familyId)
+            is Screen.ParentDashboard -> ParentDashboardScreen(navigator, screen.userId, screen.familyId)
+            is Screen.ChildDashboard -> ChildDashboardScreen(navigator, screen.userId, screen.familyId)
+            is Screen.CreateTransaction -> CreateTransactionScreen(navigator, screen.accountId, screen.userId)
+            is Screen.PendingTransactions -> PendingTransactionsScreen(navigator, screen.familyId, screen.userId)
         }
     }
 }
