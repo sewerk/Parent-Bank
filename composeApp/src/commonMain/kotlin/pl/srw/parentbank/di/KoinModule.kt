@@ -8,30 +8,34 @@ import org.koin.dsl.module
  */
 fun appModule(): List<Module> = listOf(
     platformModule(),
-    dataModule(),
-    domainModule()
+    DataModule.dataModule(),
+    DomainModule.domainModule()
 )
 
 /**
- * Platform-specific module (expect/actual pattern).
- * Will be implemented in androidMain and iosMain.
+ * Data layer module container.
  */
-expect fun platformModule(): Module
-
-/**
- * Data layer module for repositories and data sources.
- * Will be populated as we implement repositories.
- */
-fun dataModule() = module {
-    // Repository implementations will be added here
-    // Example: single<FamilyRepository> { FamilyRepositoryImpl(get()) }
+internal object DataModule {
+    /**
+     * Data layer module for repositories and data sources.
+     * Will be populated as we implement repositories.
+     */
+    fun dataModule() = module {
+        // Repository implementations will be added here
+        // Example: single<FamilyRepository> { FamilyRepositoryImpl(get()) }
+    }
 }
 
 /**
- * Domain layer module for use cases.
- * Will be populated as we implement use cases.
+ * Domain layer module container.
  */
-fun domainModule() = module {
-    // Use cases will be added here
-    // Example: factory { CreateFamilyUseCase(get()) }
+internal object DomainModule {
+    /**
+     * Domain layer module for use cases.
+     * Will be populated as we implement use cases.
+     */
+    fun domainModule() = module {
+        // Use cases will be added here
+        // Example: factory { CreateFamilyUseCase(get()) }
+    }
 }

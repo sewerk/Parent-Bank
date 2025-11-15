@@ -11,14 +11,13 @@ interface StringProvider {
 }
 
 /**
- * Expect/actual for getting the system language.
+ * String resources container.
  */
-expect fun getSystemLanguage(): Language
-
-/**
- * Default string resources for English.
- */
-val englishStrings = mapOf(
+internal object StringResources {
+    /**
+     * Default string resources for English.
+     */
+    val englishStrings = mapOf(
     Strings.APP_NAME to "Parent Bank",
     Strings.OK to "OK",
     Strings.CANCEL to "Cancel",
@@ -80,10 +79,10 @@ val englishStrings = mapOf(
     Strings.ERROR_AUTH to "Authentication error"
 )
 
-/**
- * Default string resources for Polish.
- */
-val polishStrings = mapOf(
+    /**
+     * Default string resources for Polish.
+     */
+    val polishStrings = mapOf(
     Strings.APP_NAME to "Bank Rodzinny",
     Strings.OK to "OK",
     Strings.CANCEL to "Anuluj",
@@ -144,14 +143,15 @@ val polishStrings = mapOf(
     Strings.ERROR_VALIDATION to "Błąd walidacji",
     Strings.ERROR_AUTH to "Błąd uwierzytelniania"
 )
+}
 
 /**
  * Simple string provider implementation.
  */
 class SimpleStringProvider(private val language: Language = getSystemLanguage()) : StringProvider {
     private val strings = when (language) {
-        Language.ENGLISH -> englishStrings
-        Language.POLISH -> polishStrings
+        Language.ENGLISH -> StringResources.englishStrings
+        Language.POLISH -> StringResources.polishStrings
     }
 
     override fun getString(key: String): String {
