@@ -35,11 +35,6 @@ jobs:
     - name: Assemble Android Debug APK
       run: ./gradlew :composeApp:assembleDebug --no-daemon
 
-    - name: Build Web targets
-      run: |
-        ./gradlew :composeApp:wasmJsBrowserDistribution --no-daemon
-        ./gradlew :composeApp:jsBrowserDistribution --no-daemon
-
     - name: Upload build reports
       if: failure()
       uses: actions/upload-artifact@v4
