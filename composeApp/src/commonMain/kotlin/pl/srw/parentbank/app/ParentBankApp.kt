@@ -1,5 +1,6 @@
 package pl.srw.parentbank.app
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,6 +26,11 @@ import pl.srw.parentbank.presentation.user.UserViewModel
 fun ParentBankApp() {
     MaterialTheme {
         val navigator = rememberNavigator()
+
+        // Handle Android system back button
+        BackHandler(enabled = navigator.canNavigateBack()) {
+            navigator.navigateBack()
+        }
 
         when (val screen = navigator.currentScreen) {
             is Screen.Welcome -> WelcomeScreen(navigator)
