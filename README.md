@@ -35,12 +35,14 @@ The application creates a safe environment where children can learn money manage
 ### Technology Stack
 
 - **Kotlin Multiplatform (KMP)**: Shared business logic across platforms
-- **Android**: Jetpack Compose, Material Design 3
-- **iOS**: SwiftUI, iOS Human Interface Guidelines
-- **Web**: Compose for Web (Wasm/JS targets)
+- **Compose Multiplatform**: Shared UI framework for Android and iOS
+- **Android**: Material Design 3 with Compose Multiplatform
+- **iOS**: Compose Multiplatform (shared UI with Android)
+- **Web**: Compose for Web (Wasm/JS targets) - Planned
 - **Backend**: Firebase (Authentication, Firestore, Cloud Messaging) - integrated after offline functionality
-- **Local Storage**: SQLDelight or Realm for offline-first data persistence
+- **Local Storage**: SQLDelight for offline-first data persistence
 - **Architecture**: Clean Architecture with separation of UI, Domain, and Data layers
+- **Dependency Injection**: Koin for dependency injection
 
 ### Development Philosophy
 
@@ -52,11 +54,31 @@ The application creates a safe environment where children can learn money manage
 ## Project Structure
 
 - `/composeApp` - Shared Kotlin Multiplatform code
-  - `commonMain` - Shared business logic and UI
-  - `androidMain` - Android-specific implementations
-  - `iosMain` - iOS-specific implementations
-  - `webMain` - Web-specific implementations
-- `/iosApp` - iOS application entry point and SwiftUI code
+  - **`commonMain`** - **~95% of app code shared across all platforms**
+    - Complete business logic (domain models, repositories, use cases)
+    - Complete UI implementation with Compose Multiplatform
+    - ViewModels and navigation
+    - Database schema (SQLDelight)
+    - Dependency injection modules (Koin)
+  - `androidMain` - Android-specific code (~5%)
+    - Database driver implementation
+    - Application class and Koin initialization
+    - Platform-specific dependencies
+  - `iosMain` - iOS-specific code (~5%)
+    - Database driver implementation
+    - MainViewController and Koin initialization
+    - Platform-specific dependencies
+  - `webMain` - Web-specific implementations (planned)
+- `/iosApp` - iOS application entry point (calls shared code from `iosMain`)
+
+### Code Sharing Strategy
+
+The project maximizes code reuse through **Compose Multiplatform**:
+- **100% shared UI** - All screens written once in `commonMain`
+- **100% shared business logic** - All use cases, repositories, and models in `commonMain`
+- **Platform-specific only when necessary** - Database drivers and initialization (~5% of code)
+
+This approach results in approximately 95% code sharing between Android and iOS platforms.
 
 ## Development
 
@@ -79,7 +101,62 @@ For detailed product requirements, features, and implementation plan, see [PRD.m
 
 ## Project Status
 
-This project is currently in the planning phase. See the [PRD.md](PRD.md) for the complete implementation roadmap organized into phases.
+### ✅ Completed Phases
+
+**Phase 1: Project Setup & Foundation** - Complete
+- Kotlin Multiplatform project structure
+- Domain models (Family, User, Account, Transaction, ScheduledTransaction)
+- Repository interfaces
+- SQLDelight database schema
+- Error handling utilities (Outcome, AppException)
+- Internationalization setup (EN/PL)
+
+**Phase 2: Data Layer** - Complete
+- Repository implementations with SQLDelight
+- Database drivers for Android and iOS
+- Type-safe database queries
+- Reactive Flow support
+
+**Phase 3: Domain Layer** - Complete
+- Family management use cases (Create, Join)
+- User and account creation use cases
+- Transaction use cases (Create, Approve, Deny)
+- Scheduled transaction use cases
+- Automated execution engine for recurring transactions
+
+**Phase 4-5: Presentation Layer (Mobile)** - Complete
+- Navigation system
+- ViewModels with state management
+- Complete UI implementation using Compose Multiplatform
+- Shared UI across Android and iOS (100% code sharing)
+- Koin dependency injection setup
+
+**Phase 7: Session Persistence** - Complete
+- User session management with local storage
+- Automatic login restoration on app restart
+- Logout functionality for both parent and child dashboards
+- Session repository with SQLDelight persistence
+
+### 📱 Current App Features
+
+The mobile app is **fully functional** with:
+- Family creation and joining with unique codes
+- Parent and child user profiles
+- Parent dashboard with family account overview
+- Child dashboard with personal account
+- Transaction creation with approval workflow
+- Pending transaction management for parents
+- Support for Income and Expense transactions
+- Negative balances for teaching loans/credit concepts
+- **Session persistence** - Login state preserved across app restarts
+- **Logout functionality** - Secure session management
+
+### 🎯 Next Steps
+
+- **Phase 7**: Background scheduler for scheduled transactions
+- **Phase 8**: Firebase Integration (Authentication, Cloud Sync)
+- **Phase 9**: Input validation, UI polish, transaction history improvements
+- **Phase 10+**: Testing, optimization, and launch preparation
 
 The development follows an offline-first approach, with Firebase integration planned after all core offline functionality is complete and tested.
 

@@ -56,6 +56,7 @@ kotlin {
 
             // Dependency Injection - Koin
             implementation(libs.koin.core)
+            implementation(libs.koin.compose)
 
             // SQLDelight
             implementation(libs.sqldelight.runtime)

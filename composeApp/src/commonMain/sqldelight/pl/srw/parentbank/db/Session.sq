@@ -1,0 +1,19 @@
+CREATE TABLE SessionEntity (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+-- Queries
+selectByKey:
+SELECT value FROM SessionEntity WHERE key = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO SessionEntity(key, value, updatedAt)
+VALUES (?, ?, ?);
+
+deleteByKey:
+DELETE FROM SessionEntity WHERE key = ?;
+
+selectAll:
+SELECT * FROM SessionEntity;
