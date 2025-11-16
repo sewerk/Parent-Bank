@@ -170,13 +170,13 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 
 #### Platform-Specific Code
 - **Android**:
-  - Jetpack Compose for UI
+  - Compose Multiplatform for UI (shared with iOS)
   - Material Design 3 components
-  - Android-specific permissions and services
+  - Android-specific database drivers and initialization
 - **iOS**:
-  - SwiftUI for UI
-  - iOS design guidelines
-  - iOS-specific integrations
+  - Compose Multiplatform for UI (shared with Android)
+  - Material Design 3 components
+  - iOS-specific database drivers and initialization
 - **Web**:
   - Compose for Web (Wasm/JS targets)
   - Responsive web design
@@ -196,9 +196,9 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 ```
 ┌─────────────────────────────────────┐
 │         Presentation Layer          │
-│   (Android: Compose, iOS: SwiftUI,  │
-│      Web: Compose for Web)          │
-│         Platform-Specific           │
+│   (Compose Multiplatform UI,        │
+│    ViewModels, Navigation)          │
+│     Shared (KMP) - ~95% shared      │
 └─────────────────────────────────────┘
                   ↕
 ┌─────────────────────────────────────┐
@@ -216,23 +216,30 @@ Parent Bank aims to provide a secure, intuitive, and educational platform for fa
 ┌─────────────────────────────────────┐
 │      External Services              │
 │  (Firebase, Local Storage)          │
-│    Platform-Specific Wrappers       │
+│  Platform-Specific (~5% of code)    │
 └─────────────────────────────────────┘
 ```
 
 #### Key Components
 
 **Shared Module (commonMain)**
-- Domain Models: Family, User, Account, Transaction, ScheduledTransaction
-- Use Cases: CreateTransaction, ApproveRequest, ScheduleRecurringTransaction, etc.
-- Repositories (Interfaces): FamilyRepository, TransactionRepository, UserRepository
-- Firebase Client (expect/actual pattern)
+- Domain Models: Family, User, Account, Transaction, ScheduledTransaction, UserSession
+- Use Cases: CreateFamily, JoinFamily, CreateUser, CreateAccount, CreateTransaction, ApproveTransaction, DenyTransaction, CreateScheduledTransaction, ExecuteScheduledTransactions, SaveSession, GetSession, ClearSession
+- Repositories (Interfaces): FamilyRepository, UserRepository, AccountRepository, TransactionRepository, ScheduledTransactionRepository, SessionRepository
+- Repository Implementations: All repository implementations with SQLDelight
+- Presentation Layer: ViewModels (FamilyViewModel, UserViewModel, DashboardViewModel, TransactionViewModel, AppViewModel)
+- UI Screens: All Compose Multiplatform screens (Welcome, CreateFamily, JoinFamily, CreateUser, ParentDashboard, ChildDashboard, CreateTransaction, PendingTransactions)
+- Navigation: Navigator and Screen sealed class
+- Dependency Injection: Koin modules
+- Firebase Client (expect/actual pattern) - Planned
 
-**Platform Modules (androidMain, iosMain, webMain)**
-- UI Implementation
-- Firebase SDK integration (actual implementations)
-- Local database (SQLDelight or Realm)
-- Platform-specific utilities
+**Platform Modules (androidMain, iosMain)**
+- Database Driver Factory: Platform-specific SQLDelight driver
+- Koin Initialization: Platform-specific app initialization
+- Platform Context: Android Application context / iOS platform specifics
+
+**Platform Modules (webMain)** - Planned
+- Web-specific implementations
 
 ## Error Handling
 
@@ -450,54 +457,54 @@ buildTypes {
 
 ## Tasks
 
-### Phase 1: Project Setup & Foundation
+### Phase 1: Project Setup & Foundation ✅ COMPLETE
 
 #### Task 1.1: Project Initialization
-- [ ] Create Kotlin Multiplatform project structure
-- [ ] Set up commonMain, androidMain, iosMain, webMain source sets
-- [ ] Configure Gradle build files
-- [ ] Add necessary KMP dependencies
-- [ ] Set up version catalog for dependency management
-- [ ] Initialize Git repository and create .gitignore
+- [x] Create Kotlin Multiplatform project structure
+- [x] Set up commonMain, androidMain, iosMain source sets
+- [x] Configure Gradle build files
+- [x] Add necessary KMP dependencies
+- [x] Set up version catalog for dependency management
+- [x] Initialize Git repository and create .gitignore
 - [ ] Set up CI/CD pipeline (GitHub Actions or similar)
 - [ ] Configure internationalization support (English, Polish)
 
 #### Task 1.2: Architecture Setup (Offline-First)
-- [ ] Define project architecture (Clean Architecture)
-- [ ] Create module structure (data, domain, presentation)
-- [ ] Set up dependency injection (Koin or Kotlin Inject)
-- [ ] Create base classes and interfaces
-- [ ] Set up navigation structure (Android: Compose Navigation, iOS: SwiftUI Navigation, Web: Compose Navigation)
-- [ ] Configure local database (SQLDelight or Realm) for offline-first storage
-- [ ] Set up logging framework with fail-fast error handling
+- [x] Define project architecture (Clean Architecture)
+- [x] Create module structure (data, domain, presentation)
+- [x] Set up dependency injection (Koin)
+- [x] Create base classes and interfaces (Outcome, AppException)
+- [x] Set up navigation structure (Compose Multiplatform Navigation - shared)
+- [x] Configure local database (SQLDelight) for offline-first storage
+- [x] Set up error handling with fail-fast approach
 - [ ] Set up i18n resource files for English and Polish
 - [ ] Configure string resources and localization utilities
 
-### Phase 2: Core Features - Data Layer (OFFLINE ONLY)
+### Phase 2: Core Features - Data Layer (OFFLINE ONLY) ✅ COMPLETE
 
 #### Task 2.1: Data Models (Offline-First)
-- [ ] Create domain models (Family, User, Account, Transaction, ScheduledTransaction)
-- [ ] Design Transaction model with separate types: Income and Expense
-- [ ] Design Account model to allow negative balances (loan/credit feature)
-- [ ] Create enums (UserRole, TransactionType, TransactionStatus, Frequency)
-- [ ] Add data validation logic with fail-fast approach
+- [x] Create domain models (Family, User, Account, Transaction, ScheduledTransaction)
+- [x] Design Transaction model with separate types: Income and Expense
+- [x] Design Account model to allow negative balances (loan/credit feature)
+- [x] Create enums (UserRole, TransactionType, TransactionStatus, Frequency)
+- [x] Add data validation logic with fail-fast approach
 - [ ] Add i18n keys for all user-facing text in models
 
 #### Task 2.2: Repositories (Local Storage Only)
-- [ ] Create repository interfaces in domain layer
-- [ ] Implement FamilyRepository with local database
-- [ ] Implement UserRepository with local database
-- [ ] Implement AccountRepository with local database (support negative balances)
-- [ ] Implement TransactionRepository with local database (Income and Expense types)
-- [ ] Implement ScheduledTransactionRepository with local database
-- [ ] Add fail-fast error handling and result wrapping
-- [ ] Test all repositories work completely offline
+- [x] Create repository interfaces in domain layer
+- [x] Implement FamilyRepository with local database (SQLDelight)
+- [x] Implement UserRepository with local database (SQLDelight)
+- [x] Implement AccountRepository with local database (support negative balances)
+- [x] Implement TransactionRepository with local database (Income and Expense types)
+- [x] Implement ScheduledTransactionRepository with local database
+- [x] Add fail-fast error handling and result wrapping (Outcome sealed class)
+- [x] Test all repositories work completely offline
 
-### Phase 3: Business Logic - Domain Layer
+### Phase 3: Business Logic - Domain Layer ✅ COMPLETE
 
 #### Task 3.1: Use Cases - Family & User Management
-- [ ] CreateFamilyUseCase
-- [ ] JoinFamilyUseCase
+- [x] CreateFamilyUseCase (generates unique 6-character family code)
+- [x] JoinFamilyUseCase (validates family code format)
 - [ ] AddFamilyMemberUseCase
 - [ ] GetFamilyMembersUseCase
 - [ ] UpdateUserProfileUseCase
@@ -505,123 +512,89 @@ buildTypes {
 - [ ] GetUserByIdUseCase
 
 #### Task 3.2: Use Cases - Account Management
-- [ ] CreateChildAccountUseCase
+- [x] CreateAccountUseCase (auto-creates for child users)
 - [ ] GetAccountByIdUseCase
 - [ ] GetAllAccountsForFamilyUseCase
 - [ ] UpdateAccountBalanceUseCase
 - [ ] DeactivateAccountUseCase
 
 #### Task 3.3: Use Cases - Transaction Management
-- [ ] CreateTransactionUseCase (with validation)
-- [ ] ApproveTransactionUseCase
-- [ ] DenyTransactionUseCase
+- [x] CreateTransactionUseCase (parent=auto-approved, child=pending)
+- [x] ApproveTransactionUseCase (parent-only, updates balance)
+- [x] DenyTransactionUseCase (parent-only, no balance update)
 - [ ] GetTransactionHistoryUseCase
 - [ ] GetPendingTransactionsUseCase
 
 #### Task 3.4: Use Cases - Scheduled Transactions
-- [ ] CreateScheduledTransactionUseCase (support fixed and percentage-based)
+- [x] CreateScheduledTransactionUseCase (support fixed and percentage-based)
 - [ ] UpdateScheduledTransactionUseCase
 - [ ] DeleteScheduledTransactionUseCase
-- [ ] ExecuteScheduledTransactionUseCase (handle both fixed amounts and percentage calculations)
+- [x] ExecuteScheduledTransactionsUseCase (handle both fixed amounts and percentage calculations)
 - [ ] GetScheduledTransactionsUseCase
 - [ ] PauseScheduledTransactionUseCase
 
 #### Task 3.5: Business Rules Validation
-- [ ] Implement balance validation (allow negative balances for loan/credit)
-- [ ] Implement permission checks (parent vs child)
-- [ ] Implement transaction approval logic
-- [ ] Add transaction amount validation (positive amounts only)
-- [ ] Add transaction type validation (Income or Expense)
-- [ ] Add date validation
-- [ ] Use fail-fast validation (crash on invalid data)
+- [x] Implement balance validation (allow negative balances for loan/credit)
+- [x] Implement permission checks (parent vs child in transaction creation)
+- [x] Implement transaction approval logic
+- [x] Add transaction amount validation (positive amounts only)
+- [x] Add transaction type validation (Income or Expense)
+- [x] Add date validation
+- [x] Use fail-fast validation (Outcome.Failure with AppException)
 
-### Phase 4: UI - Android
+### Phase 4-5: UI - Mobile (Android & iOS) ✅ COMPLETE
 
-#### Task 4.1: Android - Authentication & Setup
-- [ ] Create login screen (Compose) with i18n support
-- [ ] Create registration screen with i18n support
-- [ ] Implement role selection with i18n support
-- [ ] Create family creation screen with i18n support
-- [ ] Create join family screen with i18n support
+**NOTE: Using Compose Multiplatform, all UI screens are shared in commonMain between Android and iOS**
+
+#### Task 4-5.1: Shared Authentication & Setup Screens
+- [x] Create welcome screen (Compose Multiplatform)
+- [x] Implement role selection (Parent/Child toggle)
+- [x] Create family creation screen
+- [x] Create join family screen (6-character code entry)
+- [x] Create user profile creation screen
 - [ ] Implement automatic language detection from system settings
+- [ ] Add i18n support for all screens
 
-#### Task 4.2: Android - Parent Screens
-- [ ] Create parent dashboard/home screen (show negative balances clearly)
-- [ ] Create account management screen
-- [ ] Create transaction creation screen (separate Income and Expense options)
-- [ ] Create transaction approval screen
+#### Task 4-5.2: Shared Parent Screens
+- [x] Create parent dashboard/home screen (show all family accounts)
+- [x] Create transaction creation screen (separate Income and Expense options)
+- [x] Create pending transaction approval screen
 - [ ] Create scheduled transaction screen (support fixed and percentage-based)
-- [ ] Create transaction history screen
+- [ ] Create detailed transaction history screen
 - [ ] Create family settings screen
+- [ ] Show negative balances with clear visual indicators
 - [ ] Ensure all screens support English and Polish
 
-#### Task 4.3: Android - Child Screens
-- [ ] Create child dashboard/home screen
-- [ ] Create account view screen
-- [ ] Create transaction request screen
-- [ ] Create transaction history screen
-- [ ] Create pending requests screen
+#### Task 4-5.3: Shared Child Screens
+- [x] Create child dashboard/home screen (balance display, recent transactions)
+- [x] Create transaction request screen
+- [x] Create transaction history list
+- [ ] Create pending requests status screen
+- [ ] Add logout functionality ✅
 
-#### Task 4.4: Android - Common UI
-- [ ] Create navigation graph
-- [ ] Create app theme (Material Design 3)
-- [ ] Create reusable composables (buttons, cards, inputs)
-- [ ] Create loading states
-- [ ] Create error states
+#### Task 4-5.4: Shared Common UI
+- [x] Create navigation system (Navigator class, Screen sealed class)
+- [x] Create app theme (Material Design 3)
+- [x] Create reusable composables (buttons, cards, inputs, chips)
+- [x] Create loading states (CircularProgressIndicator)
+- [x] Create error states (inline error messages)
 - [ ] Implement notifications UI
 - [ ] Create settings screen
 
-#### Task 4.5: Android - ViewModels
-- [ ] Create AuthViewModel
-- [ ] Create ParentDashboardViewModel
-- [ ] Create ChildDashboardViewModel
-- [ ] Create TransactionViewModel
+#### Task 4-5.5: Shared ViewModels
+- [x] Create FamilyViewModel (create/join family)
+- [x] Create UserViewModel (user profile creation)
+- [x] Create DashboardViewModel (parent and child dashboard data)
+- [x] Create TransactionViewModel (create, approve, deny)
+- [x] Create AppViewModel (session management, logout)
 - [ ] Create ScheduledTransactionViewModel
 - [ ] Create SettingsViewModel
 
-### Phase 5: UI - iOS
-
-#### Task 5.1: iOS - Authentication & Setup
-- [ ] Create login screen (SwiftUI) with i18n support
-- [ ] Create registration screen with i18n support
-- [ ] Implement role selection with i18n support
-- [ ] Create family creation screen with i18n support
-- [ ] Create join family screen with i18n support
-- [ ] Implement automatic language detection from system settings
-
-#### Task 5.2: iOS - Parent Screens
-- [ ] Create parent dashboard/home screen (show negative balances clearly)
-- [ ] Create account management screen
-- [ ] Create transaction creation screen (separate Income and Expense options)
-- [ ] Create transaction approval screen
-- [ ] Create scheduled transaction screen (support fixed and percentage-based)
-- [ ] Create transaction history screen
-- [ ] Create family settings screen
-- [ ] Ensure all screens support English and Polish
-
-#### Task 5.3: iOS - Child Screens
-- [ ] Create child dashboard/home screen
-- [ ] Create account view screen
-- [ ] Create transaction request screen
-- [ ] Create transaction history screen
-- [ ] Create pending requests screen
-
-#### Task 5.4: iOS - Common UI
-- [ ] Create navigation structure
-- [ ] Create app theme (iOS design guidelines)
-- [ ] Create reusable views (buttons, cards, inputs)
-- [ ] Create loading states
-- [ ] Create error states
-- [ ] Implement notifications UI
-- [ ] Create settings screen
-
-#### Task 5.5: iOS - ViewModels/ObservableObjects
-- [ ] Create AuthViewModel
-- [ ] Create ParentDashboardViewModel
-- [ ] Create ChildDashboardViewModel
-- [ ] Create TransactionViewModel
-- [ ] Create ScheduledTransactionViewModel
-- [ ] Create SettingsViewModel
+#### Task 4-5.6: Platform-Specific Setup
+- [x] Android: ParentBankApplication with Koin initialization
+- [x] Android: MainActivity with setContent
+- [x] iOS: MainViewController with Koin initialization
+- [x] iOS: ComposeUIViewController wrapper
 
 ### Phase 6: UI - Web
 
@@ -670,22 +643,33 @@ buildTypes {
 - [ ] Create ScheduledTransactionViewModel
 - [ ] Create SettingsViewModel
 
-### Phase 7: Offline Features Testing
+### Phase 7: Offline Features & Session Persistence (PARTIALLY COMPLETE)
 
-#### Task 7.1: Scheduled Transactions (Offline)
-- [ ] Implement scheduled transaction execution logic (offline-only)
-- [ ] Create background job scheduler (Android: WorkManager, iOS: Background Tasks, Web: Service Workers/Firebase Cloud Functions)
+#### Task 7.1: Session Persistence ✅ COMPLETE
+- [x] Create UserSession domain model
+- [x] Create SessionRepository interface
+- [x] Create Session.sq SQLDelight schema
+- [x] Implement SessionRepositoryImpl
+- [x] Create SaveSessionUseCase, GetSessionUseCase, ClearSessionUseCase
+- [x] Create AppViewModel for session management
+- [x] Implement automatic session restoration on app start
+- [x] Add logout functionality to dashboards
+
+#### Task 7.2: Scheduled Transactions (Offline)
+- [x] Implement scheduled transaction execution logic (ExecuteScheduledTransactionsUseCase)
+- [ ] Create background job scheduler (Android: WorkManager, iOS: Background Tasks)
 - [ ] Test recurring transaction creation with fixed amounts
 - [ ] Test percentage-based interest calculations
 - [ ] Test with negative balances
 - [ ] Implement local notifications
 - [ ] Add pause/resume functionality
 
-#### Task 7.2: Testing Offline Functionality
+#### Task 7.3: Testing Offline Functionality
 - [ ] Test complete offline app flow (end-to-end)
 - [ ] Test negative balance scenarios
 - [ ] Test Income and Expense transaction types
 - [ ] Test all features work without network
+- [ ] Test session persistence across app restarts
 - [ ] Test both English and Polish localizations
 - [ ] Performance testing of local database
 - [ ] Test fail-fast error handling
@@ -923,9 +907,10 @@ buildTypes {
 | 1.2 | 2025-11-05 | Updated | Added fail-fast error handling approach; Added KISS over DRY principle; Implemented offline-first development strategy (Firebase integration after offline functionality); Enabled negative balances for loan/credit education; Added multi-language support (English and Polish) with automatic system detection; Reorganized tasks to reflect offline-first approach |
 | 1.3 | 2025-11-05 | Updated | Reverted to separate "Add Income" and "Add Expenses" transaction types (instead of signed amounts); Maintained negative balance support for loan/credit teaching; Changed language selection to automatic system detection (removed manual switcher) |
 | 1.4 | 2025-11-05 | Updated | Removed all time estimates and week numbers from phases; Removed timeline references from documentation; Changed to phase-based organization without date commitments |
+| 1.5 | 2025-11-16 | Updated | Updated architecture to reflect Compose Multiplatform implementation (shared UI for Android/iOS instead of separate SwiftUI); Marked Phases 1-5 and partial Phase 7 as complete; Added session persistence implementation details; Updated Key Components to reflect actual implementation; Consolidated Phase 4 and 5 into shared mobile UI phase |
 
 ---
 
 **Document Status**: Updated
-**Last Updated**: 2025-11-05
-**Next Review**: Upon project kickoff
+**Last Updated**: 2025-11-16
+**Next Review**: Upon completion of Phase 8 (Firebase Integration)

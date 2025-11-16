@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import org.koin.compose.koinInject
 import pl.srw.parentbank.domain.model.TransactionType
 import pl.srw.parentbank.domain.model.UserRole
+import pl.srw.parentbank.presentation.app.AppViewModel
 import pl.srw.parentbank.presentation.dashboard.DashboardViewModel
 import pl.srw.parentbank.presentation.family.FamilyViewModel
 import pl.srw.parentbank.presentation.navigation.Navigator
@@ -25,6 +26,8 @@ import pl.srw.parentbank.presentation.user.UserViewModel
 @Composable
 fun ParentBankApp() {
     MaterialTheme {
+        val appViewModel: AppViewModel = koinInject()
+        val appState by appViewModel.state.collectAsState()
         val navigator = rememberNavigator()
 
         // Handle Android system back button
@@ -32,15 +35,36 @@ fun ParentBankApp() {
             navigator.navigateBack()
         }
 
-        when (val screen = navigator.currentScreen) {
-            is Screen.Welcome -> WelcomeScreen(navigator)
-            is Screen.CreateFamily -> CreateFamilyScreen(navigator)
-            is Screen.JoinFamily -> JoinFamilyScreen(navigator)
-            is Screen.CreateUser -> CreateUserScreen(navigator, screen.familyId)
-            is Screen.ParentDashboard -> ParentDashboardScreen(navigator, screen.userId, screen.familyId)
-            is Screen.ChildDashboard -> ChildDashboardScreen(navigator, screen.userId, screen.familyId)
-            is Screen.CreateTransaction -> CreateTransactionScreen(navigator, screen.accountId, screen.userId)
-            is Screen.PendingTransactions -> PendingTransactionsScreen(navigator, screen.familyId, screen.userId)
+        // Check for existing session and navigate accordingly
+        LaunchedEffect(appState.currentSession) {
+            appState.currentSession?.let { session ->
+                when (session.userRole) {
+                    UserRole.PARENT -> navigator.navigateTo(
+                        Screen.ParentDashboard(session.userId, session.familyId)
+                    )
+                    UserRole.CHILD -> navigator.navigateTo(
+                        Screen.ChildDashboard(session.userId, session.familyId)
+                    )
+                }
+            }
+        }
+
+        if (appState.isLoading) {
+            // Show loading screen while checking session
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            when (val screen = navigator.currentScreen) {
+                is Screen.Welcome -> WelcomeScreen(navigator)
+                is Screen.CreateFamily -> CreateFamilyScreen(navigator)
+                is Screen.JoinFamily -> JoinFamilyScreen(navigator)
+                is Screen.CreateUser -> CreateUserScreen(navigator, screen.familyId, appViewModel)
+                is Screen.ParentDashboard -> ParentDashboardScreen(navigator, screen.userId, screen.familyId, appViewModel)
+                is Screen.ChildDashboard -> ChildDashboardScreen(navigator, screen.userId, screen.familyId, appViewModel)
+                is Screen.CreateTransaction -> CreateTransactionScreen(navigator, screen.accountId, screen.userId)
+                is Screen.PendingTransactions -> PendingTransactionsScreen(navigator, screen.familyId, screen.userId)
+            }
         }
     }
 }
@@ -215,12 +239,14 @@ fun JoinFamilyScreen(navigator: Navigator) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateUserScreen(navigator: Navigator, familyId: String) {
+fun CreateUserScreen(navigator: Navigator, familyId: String, appViewModel: AppViewModel) {
     val viewModel: UserViewModel = koinInject()
     val state = viewModel.state
 
     LaunchedEffect(state.createdUser) {
         state.createdUser?.let { user ->
+            // Save session for persistence
+            appViewModel.onUserLoggedIn(user)
             when (user.role) {
                 UserRole.PARENT -> navigator.navigateTo(Screen.ParentDashboard(user.id, familyId))
                 UserRole.CHILD -> navigator.navigateTo(Screen.ChildDashboard(user.id, familyId))
@@ -299,7 +325,7 @@ fun CreateUserScreen(navigator: Navigator, familyId: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ParentDashboardScreen(navigator: Navigator, userId: String, familyId: String) {
+fun ParentDashboardScreen(navigator: Navigator, userId: String, familyId: String, appViewModel: AppViewModel) {
     val viewModel: DashboardViewModel = koinInject()
     val state by viewModel.state.collectAsState()
 
@@ -308,7 +334,19 @@ fun ParentDashboardScreen(navigator: Navigator, userId: String, familyId: String
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Parent Dashboard") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Parent Dashboard") },
+                actions = {
+                    TextButton(onClick = {
+                        appViewModel.logout()
+                        navigator.navigateTo(Screen.Welcome)
+                    }) {
+                        Text("Logout")
+                    }
+                }
+            )
+        }
     ) { padding ->
         if (state.isLoading) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
@@ -356,7 +394,7 @@ fun ParentDashboardScreen(navigator: Navigator, userId: String, familyId: String
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChildDashboardScreen(navigator: Navigator, userId: String, familyId: String) {
+fun ChildDashboardScreen(navigator: Navigator, userId: String, familyId: String, appViewModel: AppViewModel) {
     val viewModel: DashboardViewModel = koinInject()
     val state by viewModel.state.collectAsState()
 
@@ -365,7 +403,19 @@ fun ChildDashboardScreen(navigator: Navigator, userId: String, familyId: String)
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("My Account") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("My Account") },
+                actions = {
+                    TextButton(onClick = {
+                        appViewModel.logout()
+                        navigator.navigateTo(Screen.Welcome)
+                    }) {
+                        Text("Logout")
+                    }
+                }
+            )
+        }
     ) { padding ->
         if (state.isLoading) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {

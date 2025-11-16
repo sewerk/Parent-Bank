@@ -35,12 +35,14 @@ The application creates a safe environment where children can learn money manage
 ### Technology Stack
 
 - **Kotlin Multiplatform (KMP)**: Shared business logic across platforms
-- **Android**: Jetpack Compose, Material Design 3
-- **iOS**: SwiftUI, iOS Human Interface Guidelines
-- **Web**: Compose for Web (Wasm/JS targets)
+- **Compose Multiplatform**: Shared UI framework for Android and iOS
+- **Android**: Material Design 3 with Compose Multiplatform
+- **iOS**: Compose Multiplatform (shared UI with Android)
+- **Web**: Compose for Web (Wasm/JS targets) - Planned
 - **Backend**: Firebase (Authentication, Firestore, Cloud Messaging) - integrated after offline functionality
-- **Local Storage**: SQLDelight or Realm for offline-first data persistence
+- **Local Storage**: SQLDelight for offline-first data persistence
 - **Architecture**: Clean Architecture with separation of UI, Domain, and Data layers
+- **Dependency Injection**: Koin for dependency injection
 
 ### Development Philosophy
 
@@ -74,9 +76,9 @@ The application creates a safe environment where children can learn money manage
 The project maximizes code reuse through **Compose Multiplatform**:
 - **100% shared UI** - All screens written once in `commonMain`
 - **100% shared business logic** - All use cases, repositories, and models in `commonMain`
-- **Platform-specific only when necessary** - Database drivers and initialization
+- **Platform-specific only when necessary** - Database drivers and initialization (~5% of code)
 
-See [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) for detailed architecture documentation.
+This approach results in approximately 95% code sharing between Android and iOS platforms.
 
 ## Development
 
@@ -129,6 +131,12 @@ For detailed product requirements, features, and implementation plan, see [PRD.m
 - Shared UI across Android and iOS (100% code sharing)
 - Koin dependency injection setup
 
+**Phase 7: Session Persistence** - Complete
+- User session management with local storage
+- Automatic login restoration on app restart
+- Logout functionality for both parent and child dashboards
+- Session repository with SQLDelight persistence
+
 ### 📱 Current App Features
 
 The mobile app is **fully functional** with:
@@ -140,14 +148,15 @@ The mobile app is **fully functional** with:
 - Pending transaction management for parents
 - Support for Income and Expense transactions
 - Negative balances for teaching loans/credit concepts
+- **Session persistence** - Login state preserved across app restarts
+- **Logout functionality** - Secure session management
 
 ### 🎯 Next Steps
 
-- **Phase 6-7**: Testing & Offline Features
-- **Phase 8**: Firebase Integration
-- **Phase 9-13**: Polish & Launch
-
-See [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) for detailed implementation documentation.
+- **Phase 7**: Background scheduler for scheduled transactions
+- **Phase 8**: Firebase Integration (Authentication, Cloud Sync)
+- **Phase 9**: Input validation, UI polish, transaction history improvements
+- **Phase 10+**: Testing, optimization, and launch preparation
 
 The development follows an offline-first approach, with Firebase integration planned after all core offline functionality is complete and tested.
 

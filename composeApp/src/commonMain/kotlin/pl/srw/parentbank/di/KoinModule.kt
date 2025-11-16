@@ -37,6 +37,9 @@ internal object DataModule {
         single<pl.srw.parentbank.domain.repository.ScheduledTransactionRepository> {
             pl.srw.parentbank.data.repository.ScheduledTransactionRepositoryImpl(get())
         }
+        single<pl.srw.parentbank.domain.repository.SessionRepository> {
+            pl.srw.parentbank.data.repository.SessionRepositoryImpl(get())
+        }
     }
 }
 
@@ -66,6 +69,11 @@ internal object DomainModule {
         // Scheduled transaction use cases
         factory { pl.srw.parentbank.domain.usecase.scheduled.CreateScheduledTransactionUseCase(get(), get()) }
         factory { pl.srw.parentbank.domain.usecase.scheduled.ExecuteScheduledTransactionsUseCase(get(), get(), get()) }
+
+        // Session use cases
+        factory { pl.srw.parentbank.domain.usecase.session.GetSessionUseCase(get()) }
+        factory { pl.srw.parentbank.domain.usecase.session.SaveSessionUseCase(get()) }
+        factory { pl.srw.parentbank.domain.usecase.session.ClearSessionUseCase(get()) }
     }
 }
 
@@ -78,6 +86,7 @@ internal object PresentationModule {
      */
     fun presentationModule() = module {
         // ViewModels
+        single { pl.srw.parentbank.presentation.app.AppViewModel(get(), get(), get()) }
         factory { pl.srw.parentbank.presentation.family.FamilyViewModel(get(), get()) }
         factory { pl.srw.parentbank.presentation.user.UserViewModel(get(), get()) }
         factory { pl.srw.parentbank.presentation.dashboard.DashboardViewModel(get(), get(), get()) }
