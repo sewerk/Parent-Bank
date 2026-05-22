@@ -44,6 +44,8 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.navigation.compose)
+            implementation(libs.koin.compose.viewmodel)
 
             // Coroutines
             implementation(libs.kotlinx.coroutines.core)
