@@ -2,7 +2,9 @@ package pl.srw.parentbank.app
 
 import androidx.compose.ui.window.ComposeUIViewController
 import org.koin.core.context.startKoin
+import org.koin.mp.KoinPlatform
 import pl.srw.parentbank.di.appModule
+import pl.srw.parentbank.presentation.setup.FamilySetupViewModel
 
 private var koinStarted = false
 
@@ -11,5 +13,6 @@ fun MainViewController() = run {
         startKoin { modules(appModule()) }
         koinStarted = true
     }
-    ComposeUIViewController { App() }
+    val viewModel: FamilySetupViewModel = KoinPlatform.getKoin().get()
+    ComposeUIViewController { App(viewModel) }
 }

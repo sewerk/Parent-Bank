@@ -4,11 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import org.koin.compose.koinInject
 import pl.srw.parentbank.presentation.setup.AddMemberScreen
 import pl.srw.parentbank.presentation.setup.FamilySetupScreen
 import pl.srw.parentbank.presentation.setup.FamilySetupViewModel
@@ -21,9 +19,8 @@ object Routes {
 }
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(viewModel: FamilySetupViewModel) {
     val navController = rememberNavController()
-    val viewModel = koinInject<FamilySetupViewModel>()
     val uiState by viewModel.uiState.collectAsState()
 
     NavHost(navController = navController, startDestination = Routes.FAMILY_SETUP) {
