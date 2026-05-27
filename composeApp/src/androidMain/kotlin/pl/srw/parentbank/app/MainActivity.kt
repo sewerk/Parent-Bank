@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import pl.srw.parentbank.di.appModule
 
@@ -20,11 +19,16 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun initKoin() {
-        if (GlobalContext.getOrNull() == null) {
+        if (!koinStarted) {
             startKoin {
                 androidContext(applicationContext)
                 modules(appModule())
             }
+            koinStarted = true
         }
+    }
+
+    companion object {
+        private var koinStarted = false
     }
 }

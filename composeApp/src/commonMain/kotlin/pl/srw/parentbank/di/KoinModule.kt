@@ -1,10 +1,6 @@
 package pl.srw.parentbank.di
 
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.factoryOf
-import org.koin.core.module.dsl.singleOf
-import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.bind
 import org.koin.dsl.module
 import pl.srw.parentbank.data.repository.FamilyRepositoryImpl
 import pl.srw.parentbank.data.repository.UserRepositoryImpl
@@ -25,16 +21,16 @@ fun appModule(): List<Module> = listOf(
 
 val dataModule = module {
     single { ParentBankDatabase(get()) }
-    singleOf(::FamilyRepositoryImpl) bind FamilyRepository::class
-    singleOf(::UserRepositoryImpl) bind UserRepository::class
+    single<FamilyRepository> { FamilyRepositoryImpl(get()) }
+    single<UserRepository> { UserRepositoryImpl(get()) }
 }
 
 val domainModule = module {
-    factoryOf(::CreateFamilyUseCase)
-    factoryOf(::AddFamilyMemberUseCase)
-    factoryOf(::GetFamilyMembersUseCase)
+    factory { CreateFamilyUseCase(get(), get()) }
+    factory { AddFamilyMemberUseCase(get()) }
+    factory { GetFamilyMembersUseCase(get()) }
 }
 
 val presentationModule = module {
-    viewModelOf(::FamilySetupViewModel)
+    factory { FamilySetupViewModel(get(), get(), get()) }
 }
