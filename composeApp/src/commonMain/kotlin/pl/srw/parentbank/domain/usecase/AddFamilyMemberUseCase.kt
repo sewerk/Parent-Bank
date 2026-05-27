@@ -6,7 +6,6 @@ import pl.srw.parentbank.domain.model.UserRole
 import pl.srw.parentbank.domain.repository.UserRepository
 import pl.srw.parentbank.util.AppException
 import pl.srw.parentbank.util.Outcome
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 data class AddFamilyMemberParams(
@@ -20,7 +19,6 @@ class AddFamilyMemberUseCase(
     private val userRepository: UserRepository
 ) : UseCaseWithParams<AddFamilyMemberParams, User>() {
 
-    @OptIn(ExperimentalUuidApi::class)
     override suspend fun execute(params: AddFamilyMemberParams): Outcome<User> {
         if (params.name.isBlank()) {
             return Outcome.Failure(AppException.ValidationError("name", "Member name cannot be empty"))

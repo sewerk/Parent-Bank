@@ -10,7 +10,6 @@ import pl.srw.parentbank.util.AppException
 import pl.srw.parentbank.util.Outcome
 import pl.srw.parentbank.util.flatMap
 import kotlin.random.Random
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 data class CreateFamilyParams(
@@ -23,7 +22,6 @@ class CreateFamilyUseCase(
     private val userRepository: UserRepository
 ) : UseCaseWithParams<CreateFamilyParams, Family>() {
 
-    @OptIn(ExperimentalUuidApi::class)
     override suspend fun execute(params: CreateFamilyParams): Outcome<Family> {
         if (params.familyName.isBlank()) {
             return Outcome.Failure(AppException.ValidationError("familyName", "Family name cannot be empty"))
