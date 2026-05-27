@@ -79,9 +79,29 @@ For detailed product requirements, features, and implementation plan, see [PRD.m
 
 ## Project Status
 
-This project is currently in the planning phase. See the [PRD.md](PRD.md) for the complete implementation roadmap organized into phases.
+**Current phase:** Offline-first feature development (vertical slices)
 
-The development follows an offline-first approach, with Firebase integration planned after all core offline functionality is complete and tested.
+The project follows an **iterative, vertical-slice** development approach. Each slice delivers a complete feature from database through domain logic to UI, keeping PRs small and the app testable after every merge.
+
+| Slice | Feature | Status |
+|-------|---------|--------|
+| 0 | Project setup & foundation | Done |
+| 1 | Family & User creation | To Do |
+| 2 | Navigation & role-based routing | To Do |
+| 3 | Child account creation | To Do |
+| 4 | Add Income transaction | To Do |
+| 5 | Add Expense transaction | To Do |
+| 6 | Transaction history | To Do |
+| 7 | Child dashboard | To Do |
+| 8 | Child requests & parent approval | To Do |
+| 9 | Scheduled transactions (fixed) | To Do |
+| 10 | Scheduled transactions (%) | To Do |
+| 11 | Internationalization (PL/EN) | To Do |
+| 12 | Settings & app polish | To Do |
+| 13 | iOS & Web adaptation | To Do |
+| 14 | Comprehensive testing & QA | To Do |
+
+Firebase integration is planned after all offline slices are complete and stable. See [PRD.md](PRD.md) for detailed task breakdowns and the [GitHub Issues](https://github.com/sewerk/Parent-Bank/issues) for tracking.
 
 ## License
 

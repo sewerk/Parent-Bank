@@ -450,422 +450,502 @@ buildTypes {
 
 ## Tasks
 
-### Phase 1: Project Setup & Foundation
+### Development Approach: Vertical Slices
 
-#### Task 1.1: Project Initialization
-- [ ] Create Kotlin Multiplatform project structure
-- [ ] Set up commonMain, androidMain, iosMain, webMain source sets
-- [ ] Configure Gradle build files
-- [ ] Add necessary KMP dependencies
-- [ ] Set up version catalog for dependency management
-- [ ] Initialize Git repository and create .gitignore
-- [ ] Set up CI/CD pipeline (GitHub Actions or similar)
-- [ ] Configure internationalization support (English, Polish)
+This project follows an **iterative, vertical-slice** development approach. Instead of building
+all repositories first, then all use cases, then all UI screens (horizontal layers), each slice
+delivers a **complete, testable feature** from database through domain logic to UI.
 
-#### Task 1.2: Architecture Setup (Offline-First)
-- [ ] Define project architecture (Clean Architecture)
-- [ ] Create module structure (data, domain, presentation)
-- [ ] Set up dependency injection (Koin or Kotlin Inject)
-- [ ] Create base classes and interfaces
-- [ ] Set up navigation structure (Android: Compose Navigation, iOS: SwiftUI Navigation, Web: Compose Navigation)
-- [ ] Configure local database (SQLDelight or Realm) for offline-first storage
-- [ ] Set up logging framework with fail-fast error handling
-- [ ] Set up i18n resource files for English and Polish
-- [ ] Configure string resources and localization utilities
+**Why vertical slices?**
+- After each slice, the app is **runnable and testable** end-to-end
+- PRs stay small (~300-500 lines), making code review effective
+- Issues are caught early within a narrow scope, not after building an entire layer
+- Each slice has **clear acceptance criteria** — you can verify the feature works before moving on
 
-### Phase 2: Core Features - Data Layer (OFFLINE ONLY)
+**Rules for each slice:**
+- One slice = one PR with a single goal
+- Each PR includes unit tests for new business logic
+- The app must compile and run after every merge
+- No mixing of unrelated features in one slice
+- Android UI first (Compose Multiplatform), then iOS/Web adaptations
 
-#### Task 2.1: Data Models (Offline-First)
-- [ ] Create domain models (Family, User, Account, Transaction, ScheduledTransaction)
-- [ ] Design Transaction model with separate types: Income and Expense
-- [ ] Design Account model to allow negative balances (loan/credit feature)
-- [ ] Create enums (UserRole, TransactionType, TransactionStatus, Frequency)
-- [ ] Add data validation logic with fail-fast approach
-- [ ] Add i18n keys for all user-facing text in models
+**What's already done (Phase 0):**
+- [x] KMP project structure (commonMain, androidMain, iosMain source sets)
+- [x] Gradle build configuration with Compose Multiplatform
+- [x] Domain models: Family, User, Account, Transaction, ScheduledTransaction
+- [x] Enums: UserRole, TransactionType, TransactionStatus, Frequency
+- [x] Repository interfaces (Family, User, Account, Transaction, ScheduledTransaction)
+- [x] SQLDelight schemas for all entities
+- [x] Koin DI setup (platform modules, data module, domain module)
+- [x] Utility classes: Outcome, Logger, AppException
+- [x] i18n infrastructure: Language, SystemLanguage, StringProvider, Strings
+- [x] CI/CD: GitHub Actions (Android build/test + iOS framework build)
+- [x] Base UseCase classes
 
-#### Task 2.2: Repositories (Local Storage Only)
-- [ ] Create repository interfaces in domain layer
-- [ ] Implement FamilyRepository with local database
-- [ ] Implement UserRepository with local database
-- [ ] Implement AccountRepository with local database (support negative balances)
-- [ ] Implement TransactionRepository with local database (Income and Expense types)
-- [ ] Implement ScheduledTransactionRepository with local database
-- [ ] Add fail-fast error handling and result wrapping
-- [ ] Test all repositories work completely offline
+---
 
-### Phase 3: Business Logic - Domain Layer
+### Slice 1: Family & User Creation
 
-#### Task 3.1: Use Cases - Family & User Management
-- [ ] CreateFamilyUseCase
-- [ ] JoinFamilyUseCase
-- [ ] AddFamilyMemberUseCase
-- [ ] GetFamilyMembersUseCase
-- [ ] UpdateUserProfileUseCase
-- [ ] AuthenticateUserUseCase
-- [ ] GetUserByIdUseCase
+**Goal:** A user can create a family and add members (parent + children) through the UI.
 
-#### Task 3.2: Use Cases - Account Management
-- [ ] CreateChildAccountUseCase
-- [ ] GetAccountByIdUseCase
-- [ ] GetAllAccountsForFamilyUseCase
-- [ ] UpdateAccountBalanceUseCase
-- [ ] DeactivateAccountUseCase
+#### Data Layer
+- [ ] Implement `FamilyRepositoryImpl` using SQLDelight (CRUD, observe family by ID)
+- [ ] Implement `UserRepositoryImpl` using SQLDelight (CRUD, get users by family)
+- [ ] Register repository implementations in Koin data module
 
-#### Task 3.3: Use Cases - Transaction Management
-- [ ] CreateTransactionUseCase (with validation)
-- [ ] ApproveTransactionUseCase
-- [ ] DenyTransactionUseCase
-- [ ] GetTransactionHistoryUseCase
-- [ ] GetPendingTransactionsUseCase
+#### Domain Layer
+- [ ] `CreateFamilyUseCase` — creates family with generated code, adds creating user as parent
+- [ ] `AddFamilyMemberUseCase` — adds a child or parent to existing family
+- [ ] `GetFamilyMembersUseCase` — returns all members of a family
+- [ ] Input validation: family name not empty, member name not empty, fail-fast on invalid data
 
-#### Task 3.4: Use Cases - Scheduled Transactions
-- [ ] CreateScheduledTransactionUseCase (support fixed and percentage-based)
-- [ ] UpdateScheduledTransactionUseCase
-- [ ] DeleteScheduledTransactionUseCase
-- [ ] ExecuteScheduledTransactionUseCase (handle both fixed amounts and percentage calculations)
-- [ ] GetScheduledTransactionsUseCase
-- [ ] PauseScheduledTransactionUseCase
+#### Presentation Layer
+- [ ] Create family setup screen (Compose): enter family name, create family
+- [ ] Create add member screen: enter name, select role (Parent/Child), add age for children
+- [ ] Family members list view showing added members
+- [ ] `FamilySetupViewModel` connecting UI to use cases
+- [ ] Basic Compose Navigation: setup flow → members list
 
-#### Task 3.5: Business Rules Validation
-- [ ] Implement balance validation (allow negative balances for loan/credit)
-- [ ] Implement permission checks (parent vs child)
-- [ ] Implement transaction approval logic
-- [ ] Add transaction amount validation (positive amounts only)
-- [ ] Add transaction type validation (Income or Expense)
-- [ ] Add date validation
-- [ ] Use fail-fast validation (crash on invalid data)
+#### Tests
+- [ ] Unit tests for `CreateFamilyUseCase` and `AddFamilyMemberUseCase`
+- [ ] Unit tests for repository implementations (using in-memory SQLDelight driver)
 
-### Phase 4: UI - Android
+#### Acceptance Criteria
+- [ ] User can create a family with a name
+- [ ] User can add parent and child members to the family
+- [ ] Members list displays all added members with their roles
+- [ ] Data persists across app restarts (SQLDelight)
 
-#### Task 4.1: Android - Authentication & Setup
-- [ ] Create login screen (Compose) with i18n support
-- [ ] Create registration screen with i18n support
-- [ ] Implement role selection with i18n support
-- [ ] Create family creation screen with i18n support
-- [ ] Create join family screen with i18n support
-- [ ] Implement automatic language detection from system settings
+---
 
-#### Task 4.2: Android - Parent Screens
-- [ ] Create parent dashboard/home screen (show negative balances clearly)
-- [ ] Create account management screen
-- [ ] Create transaction creation screen (separate Income and Expense options)
-- [ ] Create transaction approval screen
-- [ ] Create scheduled transaction screen (support fixed and percentage-based)
-- [ ] Create transaction history screen
-- [ ] Create family settings screen
-- [ ] Ensure all screens support English and Polish
+### Slice 2: Navigation & Role-Based Routing
 
-#### Task 4.3: Android - Child Screens
-- [ ] Create child dashboard/home screen
-- [ ] Create account view screen
-- [ ] Create transaction request screen
-- [ ] Create transaction history screen
-- [ ] Create pending requests screen
+**Goal:** After family setup, users are routed to the correct dashboard based on their role (Parent vs Child).
 
-#### Task 4.4: Android - Common UI
-- [ ] Create navigation graph
-- [ ] Create app theme (Material Design 3)
-- [ ] Create reusable composables (buttons, cards, inputs)
-- [ ] Create loading states
-- [ ] Create error states
-- [ ] Implement notifications UI
-- [ ] Create settings screen
+#### Presentation Layer
+- [ ] Implement role selection screen: "Who are you?" with list of family members
+- [ ] Create parent dashboard skeleton (empty screen with title and member name)
+- [ ] Create child dashboard skeleton (empty screen with title and member name)
+- [ ] Navigation graph: Family setup → Role selection → Parent/Child dashboard
+- [ ] `NavigationViewModel` or navigation state management
+- [ ] Store selected user in local session (current user context)
 
-#### Task 4.5: Android - ViewModels
-- [ ] Create AuthViewModel
-- [ ] Create ParentDashboardViewModel
-- [ ] Create ChildDashboardViewModel
-- [ ] Create TransactionViewModel
-- [ ] Create ScheduledTransactionViewModel
-- [ ] Create SettingsViewModel
+#### Domain Layer
+- [ ] `GetUserByIdUseCase` — retrieve user by ID for session context
+- [ ] `SetCurrentUserUseCase` — store active user selection locally
 
-### Phase 5: UI - iOS
+#### Tests
+- [ ] Unit test for role-based routing logic
 
-#### Task 5.1: iOS - Authentication & Setup
-- [ ] Create login screen (SwiftUI) with i18n support
-- [ ] Create registration screen with i18n support
-- [ ] Implement role selection with i18n support
-- [ ] Create family creation screen with i18n support
-- [ ] Create join family screen with i18n support
-- [ ] Implement automatic language detection from system settings
+#### Acceptance Criteria
+- [ ] After creating family, user selects their profile from member list
+- [ ] Parent member sees parent dashboard
+- [ ] Child member sees child dashboard
+- [ ] Back navigation works correctly
 
-#### Task 5.2: iOS - Parent Screens
-- [ ] Create parent dashboard/home screen (show negative balances clearly)
-- [ ] Create account management screen
-- [ ] Create transaction creation screen (separate Income and Expense options)
-- [ ] Create transaction approval screen
-- [ ] Create scheduled transaction screen (support fixed and percentage-based)
-- [ ] Create transaction history screen
-- [ ] Create family settings screen
-- [ ] Ensure all screens support English and Polish
+---
 
-#### Task 5.3: iOS - Child Screens
-- [ ] Create child dashboard/home screen
-- [ ] Create account view screen
-- [ ] Create transaction request screen
-- [ ] Create transaction history screen
-- [ ] Create pending requests screen
+### Slice 3: Child Account Creation (Parent)
 
-#### Task 5.4: iOS - Common UI
-- [ ] Create navigation structure
-- [ ] Create app theme (iOS design guidelines)
-- [ ] Create reusable views (buttons, cards, inputs)
-- [ ] Create loading states
-- [ ] Create error states
-- [ ] Implement notifications UI
-- [ ] Create settings screen
+**Goal:** A parent can create bank accounts for their children and see them on the dashboard.
 
-#### Task 5.5: iOS - ViewModels/ObservableObjects
-- [ ] Create AuthViewModel
-- [ ] Create ParentDashboardViewModel
-- [ ] Create ChildDashboardViewModel
-- [ ] Create TransactionViewModel
-- [ ] Create ScheduledTransactionViewModel
-- [ ] Create SettingsViewModel
+#### Data Layer
+- [ ] Implement `AccountRepositoryImpl` using SQLDelight (create, get by ID, get by family, get by child, update balance)
+- [ ] Register in Koin data module
 
-### Phase 6: UI - Web
+#### Domain Layer
+- [ ] `CreateChildAccountUseCase` — parent creates account for a child (initial balance = 0)
+- [ ] `GetAllAccountsForFamilyUseCase` — returns all accounts in the family
+- [ ] Validation: only parents can create accounts, one account per child, fail-fast on invalid input
 
-#### Task 6.1: Web - Authentication & Setup
-- [ ] Create login screen (Compose for Web) with i18n support
-- [ ] Create registration screen with i18n support
-- [ ] Implement role selection with i18n support
-- [ ] Create family creation screen with i18n support
-- [ ] Create join family screen with i18n support
-- [ ] Implement automatic language detection from browser settings
+#### Presentation Layer
+- [ ] Parent dashboard: display list of child accounts with names and balances
+- [ ] "Add account" button → create account screen (select child, confirm)
+- [ ] `ParentDashboardViewModel` with accounts list state
+- [ ] Account card composable showing child name and balance (formatted as currency)
 
-#### Task 6.2: Web - Parent Screens
-- [ ] Create parent dashboard/home screen (show negative balances clearly)
-- [ ] Create account management screen
-- [ ] Create transaction creation screen (separate Income and Expense options)
-- [ ] Create transaction approval screen
-- [ ] Create scheduled transaction screen (support fixed and percentage-based)
-- [ ] Create transaction history screen
-- [ ] Create family settings screen
-- [ ] Ensure all screens support English and Polish
-- [ ] Implement responsive layouts for different screen sizes
+#### Tests
+- [ ] Unit tests for `CreateChildAccountUseCase` (happy path + validation)
+- [ ] Unit tests for `AccountRepositoryImpl`
 
-#### Task 6.3: Web - Child Screens
-- [ ] Create child dashboard/home screen
-- [ ] Create account view screen
-- [ ] Create transaction request screen
-- [ ] Create transaction history screen
-- [ ] Create pending requests screen
-- [ ] Ensure responsive design for tablets and desktops
+#### Acceptance Criteria
+- [ ] Parent sees "no accounts yet" state on empty dashboard
+- [ ] Parent can create an account for any child in the family
+- [ ] Dashboard shows all child accounts with name and balance (0.00)
+- [ ] Cannot create duplicate accounts for the same child
 
-#### Task 6.4: Web - Common UI
-- [ ] Create navigation structure
-- [ ] Create app theme (responsive web design)
-- [ ] Create reusable composables (buttons, cards, inputs)
-- [ ] Create loading states
-- [ ] Create error states
-- [ ] Implement notifications UI
-- [ ] Create settings screen
-- [ ] Add mobile-first responsive breakpoints
+---
 
-#### Task 6.5: Web - ViewModels
-- [ ] Create AuthViewModel
-- [ ] Create ParentDashboardViewModel
-- [ ] Create ChildDashboardViewModel
-- [ ] Create TransactionViewModel
-- [ ] Create ScheduledTransactionViewModel
-- [ ] Create SettingsViewModel
+### Slice 4: Add Income Transaction
 
-### Phase 7: Offline Features Testing
+**Goal:** A parent can add income (allowance, gift) to a child's account and the balance updates.
 
-#### Task 7.1: Scheduled Transactions (Offline)
-- [ ] Implement scheduled transaction execution logic (offline-only)
-- [ ] Create background job scheduler (Android: WorkManager, iOS: Background Tasks, Web: Service Workers/Firebase Cloud Functions)
-- [ ] Test recurring transaction creation with fixed amounts
-- [ ] Test percentage-based interest calculations
-- [ ] Test with negative balances
-- [ ] Implement local notifications
-- [ ] Add pause/resume functionality
+#### Data Layer
+- [ ] Implement `TransactionRepositoryImpl` using SQLDelight (create, get by account, observe by account)
+- [ ] Register in Koin data module
 
-#### Task 7.2: Testing Offline Functionality
-- [ ] Test complete offline app flow (end-to-end)
-- [ ] Test negative balance scenarios
-- [ ] Test Income and Expense transaction types
-- [ ] Test all features work without network
-- [ ] Test both English and Polish localizations
-- [ ] Performance testing of local database
-- [ ] Test fail-fast error handling
+#### Domain Layer
+- [ ] `CreateTransactionUseCase` — creates an INCOME transaction, updates account balance
+- [ ] Validation: amount must be positive, account must exist, only parent can create directly
+- [ ] Transaction is created with status APPROVED (parent-initiated = instant)
 
-### Phase 8: Firebase Integration
+#### Presentation Layer
+- [ ] Account detail screen: shows current balance and "Add Income" button
+- [ ] Add transaction screen: enter amount, title, optional note
+- [ ] After adding, return to account detail with updated balance
+- [ ] `TransactionViewModel` handling transaction creation
 
-**NOTE: Only start this phase after offline functionality is fully working and tested**
+#### Tests
+- [ ] Unit tests for `CreateTransactionUseCase` (income path)
+- [ ] Test balance update after income transaction
 
-#### Task 8.1: Firebase Setup
+#### Acceptance Criteria
+- [ ] Parent taps a child account → sees account detail with balance
+- [ ] Parent adds income → balance increases by the amount
+- [ ] Transaction title and amount are stored
+- [ ] Balance on parent dashboard updates after adding income
+
+---
+
+### Slice 5: Add Expense Transaction
+
+**Goal:** A parent can record expenses from a child's account. Balance can go negative (loan/credit concept).
+
+#### Domain Layer
+- [ ] Extend `CreateTransactionUseCase` to handle EXPENSE type
+- [ ] Validation: amount must be positive, balance is allowed to go negative
+- [ ] EXPENSE subtracts from balance
+
+#### Presentation Layer
+- [ ] Add "Add Expense" button to account detail screen
+- [ ] Transaction type selector on add transaction screen (Income / Expense)
+- [ ] Visual indicator for negative balance (different color/icon)
+
+#### Tests
+- [ ] Unit tests for expense transaction creation
+- [ ] Test balance going negative
+- [ ] Test that negative balance is displayed correctly
+
+#### Acceptance Criteria
+- [ ] Parent can add an expense to a child's account
+- [ ] Balance decreases after expense
+- [ ] Balance can go below zero (negative)
+- [ ] Negative balances are visually distinct (color/icon)
+
+---
+
+### Slice 6: Transaction History
+
+**Goal:** Parents can view the full transaction history for each child account.
+
+#### Domain Layer
+- [ ] `GetTransactionHistoryUseCase` — returns transactions for an account, ordered by date descending
+
+#### Presentation Layer
+- [ ] Transaction history list on account detail screen (below balance)
+- [ ] Each transaction row shows: date, title, amount (green for income, red for expense), running balance
+- [ ] Transaction detail on tap (title, amount, type, date, note, who initiated)
+- [ ] Empty state when no transactions exist
+
+#### Tests
+- [ ] Unit test for `GetTransactionHistoryUseCase` (ordering, filtering)
+
+#### Acceptance Criteria
+- [ ] Account detail screen shows list of all transactions
+- [ ] Income shown in green/positive, expenses in red/negative
+- [ ] Transactions ordered newest first
+- [ ] Tapping a transaction shows full details
+
+---
+
+### Slice 7: Child Dashboard
+
+**Goal:** A child can log in and see their own account balance and transaction history.
+
+#### Presentation Layer
+- [ ] Child dashboard: display own account balance prominently
+- [ ] Recent transactions list (reuse transaction history composables from Slice 6)
+- [ ] Child cannot see other children's accounts
+- [ ] Child cannot add transactions directly (no "Add Income/Expense" buttons)
+
+#### Domain Layer
+- [ ] `GetAccountForChildUseCase` — returns the account for the current child user
+- [ ] Permission check: child can only access own account data
+
+#### Tests
+- [ ] Unit test for `GetAccountForChildUseCase` (returns only own account)
+- [ ] Test that child cannot access sibling accounts
+
+#### Acceptance Criteria
+- [ ] Child sees their balance on the dashboard
+- [ ] Child sees their transaction history
+- [ ] Child cannot see other family members' accounts
+- [ ] No transaction creation buttons visible for child role
+
+---
+
+### Slice 8: Child Transaction Requests & Parent Approval
+
+**Goal:** Children can request transactions. Parents review and approve or deny them.
+
+#### Domain Layer
+- [ ] `RequestTransactionUseCase` — child creates a transaction with status PENDING
+- [ ] `GetPendingTransactionsUseCase` — returns all PENDING transactions in the family
+- [ ] `ApproveTransactionUseCase` — parent approves, status → APPROVED, balance updated
+- [ ] `DenyTransactionUseCase` — parent denies, status → DENIED, no balance change
+- [ ] Validation: only children can create requests, only parents can approve/deny
+
+#### Presentation Layer
+- [ ] Child dashboard: "Request Transaction" button → request form (amount, title, type, note)
+- [ ] Child: pending requests list with status indicators
+- [ ] Parent dashboard: notification badge / section for pending requests
+- [ ] Parent: approval screen showing request details with Approve / Deny buttons
+- [ ] `PendingRequestsViewModel`
+
+#### Tests
+- [ ] Unit tests for the full request → approve flow
+- [ ] Unit tests for the request → deny flow
+- [ ] Test that only parents can approve/deny
+- [ ] Test that only children can create requests
+
+#### Acceptance Criteria
+- [ ] Child submits a transaction request → appears as PENDING
+- [ ] Parent sees pending requests on dashboard
+- [ ] Parent approves → child balance updates, status = APPROVED
+- [ ] Parent denies → balance unchanged, status = DENIED
+- [ ] Child sees updated status of their requests
+
+---
+
+### Slice 9: Scheduled Transactions (Fixed Amount)
+
+**Goal:** Parents can set up recurring transactions with fixed amounts (e.g., weekly allowance).
+
+#### Data Layer
+- [ ] Implement `ScheduledTransactionRepositoryImpl` using SQLDelight
+- [ ] Register in Koin data module
+
+#### Domain Layer
+- [ ] `CreateScheduledTransactionUseCase` — create recurring transaction (fixed amount, frequency, start/end date)
+- [ ] `GetScheduledTransactionsUseCase` — list all scheduled transactions for a family
+- [ ] `ExecuteScheduledTransactionUseCase` — execute due transactions and update next execution date
+- [ ] `PauseScheduledTransactionUseCase` — toggle active/paused state
+- [ ] Validation: amount > 0, valid frequency, start date required
+
+#### Presentation Layer
+- [ ] Parent account detail: "Scheduled Transactions" section
+- [ ] Create scheduled transaction screen: amount, frequency (daily/weekly/biweekly/monthly), start date, optional end date
+- [ ] List of scheduled transactions with status (active/paused)
+- [ ] Pause/resume toggle
+- [ ] `ScheduledTransactionViewModel`
+
+#### Tests
+- [ ] Unit tests for scheduled transaction creation and validation
+- [ ] Unit tests for execution logic (next date calculation per frequency)
+- [ ] Test pause/resume
+
+#### Acceptance Criteria
+- [ ] Parent creates a weekly allowance of 10.00 for a child
+- [ ] Scheduled transaction appears in the list as active
+- [ ] When due date arrives, transaction is executed and balance updates
+- [ ] Parent can pause and resume scheduled transactions
+- [ ] Next execution date is calculated correctly for each frequency
+
+---
+
+### Slice 10: Scheduled Transactions (Percentage-Based)
+
+**Goal:** Parents can create percentage-based scheduled transactions (e.g., 5% monthly interest).
+
+#### Domain Layer
+- [ ] Extend `ExecuteScheduledTransactionUseCase` to handle percentage-based calculations
+- [ ] Calculate amount as percentage of current account balance at execution time
+- [ ] Handle edge cases: zero balance, negative balance (interest on negative = charge)
+
+#### Presentation Layer
+- [ ] Extend create scheduled transaction screen: toggle between "Fixed amount" and "Percentage"
+- [ ] When percentage selected: enter percentage value instead of amount
+- [ ] Display calculated preview amount based on current balance
+- [ ] Show percentage info in scheduled transaction list
+
+#### Tests
+- [ ] Unit tests for percentage calculation on positive balance
+- [ ] Unit tests for percentage calculation on negative balance
+- [ ] Unit tests for percentage calculation on zero balance
+
+#### Acceptance Criteria
+- [ ] Parent creates 5% monthly interest on a child's account
+- [ ] On execution, amount = 5% of current balance
+- [ ] Percentage on negative balance creates an expense (interest charge)
+- [ ] Percentage on zero balance creates a 0-amount transaction (or skips)
+
+---
+
+### Slice 11: Internationalization (Polish & English)
+
+**Goal:** The entire app displays in Polish or English based on system language settings.
+
+#### Implementation
+- [ ] Populate `StringProvider` with all user-facing strings in both EN and PL
+- [ ] Replace all hardcoded strings in Compose UI with `StringProvider` lookups
+- [ ] Integrate `SystemLanguage` detection into app startup (set language once on launch)
+- [ ] Format currency amounts based on locale (PLN / USD / system default)
+- [ ] Format dates based on locale
+- [ ] Test all screens in both languages
+
+#### Tests
+- [ ] Unit test for `StringProvider` — all keys exist in both EN and PL maps
+- [ ] Unit test for `SystemLanguage` detection logic
+- [ ] Test that switching system language changes app strings
+
+#### Acceptance Criteria
+- [ ] App in Polish on Polish system, English on English system
+- [ ] All screens display translated text (no hardcoded strings remain)
+- [ ] Currency and date formats respect locale
+- [ ] No layout overflow with longer Polish text
+
+---
+
+### Slice 12: Settings & App Polish
+
+**Goal:** Settings screen, app theme, error handling, and overall UX polish.
+
+#### Presentation Layer
+- [ ] Settings screen: app theme (light/dark/system), notification preferences
+- [ ] Family settings: display family name, family code, default currency
+- [ ] App theme implementation (Material Design 3 with dynamic colors)
+- [ ] Loading states for all async operations (shimmer/skeleton)
+- [ ] Error states with user-friendly messages and retry buttons
+- [ ] Empty states for all lists (accounts, transactions, requests)
+
+#### Cross-Cutting
+- [ ] Global error handling: catch unhandled exceptions, show error UI
+- [ ] Consistent spacing, typography, and color usage across all screens
+- [ ] App icon and splash screen
+
+#### Tests
+- [ ] UI consistency check across all screens
+- [ ] Test error states display correctly
+- [ ] Test theme switching
+
+#### Acceptance Criteria
+- [ ] Settings screen accessible from dashboard
+- [ ] Theme switching works (light/dark/system)
+- [ ] All async operations show loading indicators
+- [ ] All error scenarios show user-friendly messages with retry option
+- [ ] All empty lists show meaningful empty states
+
+---
+
+### Slice 13: iOS & Web Platform Adaptation
+
+**Goal:** Ensure the app works correctly on iOS and Web platforms.
+
+#### iOS
+- [ ] Verify all Compose Multiplatform screens render correctly on iOS
+- [ ] Test SQLDelight with NativeSqliteDriver on iOS
+- [ ] Fix any platform-specific rendering issues
+- [ ] Test navigation flow end-to-end on iOS Simulator
+
+#### Web
+- [ ] Verify Compose for Web (Wasm) renders all screens
+- [ ] Test responsive layouts for different viewport sizes
+- [ ] Fix any Web-specific issues (storage, navigation)
+- [ ] Test in major browsers (Chrome, Firefox, Safari)
+
+#### Tests
+- [ ] Run shared tests on all platforms
+- [ ] Platform-specific integration tests for database drivers
+
+#### Acceptance Criteria
+- [ ] Full app flow works on iOS Simulator
+- [ ] Full app flow works in Web browser
+- [ ] No platform-specific crashes or rendering bugs
+- [ ] Data persistence works on all platforms
+
+---
+
+### Slice 14: Comprehensive Testing & QA
+
+**Goal:** Achieve >80% test coverage for shared code and verify all edge cases.
+
+#### Unit Tests
+- [ ] Tests for all use cases (happy path + edge cases)
+- [ ] Tests for all repository implementations
+- [ ] Tests for business rule validation (negative balances, permissions, approval flow)
+- [ ] Tests for fail-fast error handling
+
+#### Integration Tests
+- [ ] End-to-end test: create family → add members → create account → add transactions
+- [ ] Test: child request → parent approve → balance update
+- [ ] Test: scheduled transaction execution cycle
+- [ ] Test: data persistence across app restart
+
+#### Edge Case Tests
+- [ ] Negative balance edge cases (expense on zero, percentage on negative)
+- [ ] Large transaction amounts
+- [ ] Empty family (no members)
+- [ ] Concurrent transaction requests
+
+#### Acceptance Criteria
+- [ ] >80% code coverage for shared commonMain code
+- [ ] All business rules verified with tests
+- [ ] No failing tests in CI pipeline
+- [ ] All edge cases documented and tested
+
+---
+
+### Future: Firebase Integration
+
+**NOTE: Only start after all offline slices (1-14) are complete and stable.**
+
+#### Firebase Setup
 - [ ] Create Firebase projects (dev, prod)
-- [ ] Add Firebase to Android app
-- [ ] Add Firebase to iOS app
-- [ ] Add Firebase to Web app
+- [ ] Add Firebase to Android, iOS, and Web apps
 - [ ] Configure Firebase Authentication
 - [ ] Set up Cloud Firestore database
-- [ ] Define Firestore data structure
+- [ ] Define Firestore data structure matching SQLDelight schemas
 - [ ] Write Firebase Security Rules
-- [ ] Configure Firebase in KMP (expect/actual implementations)
 
-#### Task 8.2: Firebase Data Layer
-- [ ] Create DTOs for Firebase
-- [ ] Implement Firestore data sources
-- [ ] Implement real-time listeners for data sync
-- [ ] Add Firebase Cloud Messaging integration
-- [ ] Implement file upload for profile pictures (Firebase Storage)
-
-#### Task 8.3: Sync Implementation
+#### Sync Layer
+- [ ] Create DTOs for Firebase ↔ domain model mapping
+- [ ] Implement Firestore data sources alongside local SQLDelight
 - [ ] Implement sync queue for offline actions
-- [ ] Implement conflict resolution strategy
-- [ ] Add sync status indicators
-- [ ] Test data synchronization between devices
-- [ ] Test offline/online scenarios
-- [ ] Implement push notifications
+- [ ] Implement conflict resolution strategy (last-write-wins)
+- [ ] Real-time listeners for cross-device sync
+- [ ] Sync status indicators in UI
 
-### Phase 9: Testing
+#### Authentication
+- [ ] Replace local user selection with Firebase Auth (email/password)
+- [ ] Family join flow with authentication
+- [ ] Session management and token refresh
 
-#### Task 9.1: Unit Tests
-- [ ] Write tests for domain use cases
-- [ ] Write tests for business logic validation (negative balances, Income/Expense types)
-- [ ] Write tests for data models
-- [ ] Write tests for fail-fast validation
-- [ ] Achieve >80% code coverage for shared code
+#### Notifications
+- [ ] Firebase Cloud Messaging integration
+- [ ] Push notifications for transaction approvals/denials
+- [ ] Push notifications for scheduled transaction reminders
 
-#### Task 9.2: Integration Tests
-- [ ] Test repository implementations (offline and with Firebase)
-- [ ] Test Firebase integration
-- [ ] Test data synchronization
-- [ ] Test offline/online scenarios
+---
 
-#### Task 9.3: UI Tests
-- [ ] Write UI tests for critical flows (Android)
-- [ ] Write UI tests for critical flows (iOS)
-- [ ] Write UI tests for critical flows (Web)
-- [ ] Test user authentication flow
-- [ ] Test transaction creation with Income and Expense types
-- [ ] Test negative balance display
-- [ ] Test scheduled transaction creation
-- [ ] Test language support (English/Polish)
+### Future: Launch Preparation
 
-#### Task 9.4: End-to-End Tests
-- [ ] Test complete parent workflow
-- [ ] Test complete child workflow
-- [ ] Test multi-device sync (with Firebase)
-- [ ] Test edge cases and error scenarios with fail-fast
-- [ ] Test loan/credit scenarios (negative balances)
+#### App Store
+- [ ] App store listings (Google Play, App Store) in English and Polish
+- [ ] Web hosting and domain setup
+- [ ] Screenshots and promotional materials
+- [ ] Privacy policy and terms of service (EN/PL)
 
-### Phase 10: Polish & Optimization
+#### Final QA
+- [ ] Complete QA pass in both languages
+- [ ] Production build testing
+- [ ] Performance profiling and optimization
+- [ ] Security audit
+- [ ] Accessibility testing (TalkBack, VoiceOver, screen readers)
 
-#### Task 10.1: Performance Optimization
-- [ ] Optimize Firebase queries
-- [ ] Optimize local database queries
-- [ ] Implement pagination for transaction history
-- [ ] Optimize image loading
-- [ ] Profile app performance
-- [ ] Fix memory leaks
-- [ ] Reduce app size
-
-#### Task 10.2: UX Improvements
-- [ ] Improve loading states
-- [ ] Add animations and transitions
-- [ ] Improve error messages (both languages)
-- [ ] Improve negative balance visual indicators
-- [ ] Conduct usability testing
-- [ ] Implement feedback
-
-#### Task 10.3: Accessibility
-- [ ] Add content descriptions (Android)
-- [ ] Add accessibility labels (iOS)
-- [ ] Add ARIA labels (Web)
-- [ ] Test with TalkBack/VoiceOver/screen readers in both languages
-- [ ] Ensure proper contrast ratios
-- [ ] Support dynamic text sizing
-- [ ] Test keyboard navigation
-
-#### Task 10.4: Security Hardening
-- [ ] Review and update Firebase Security Rules
-- [ ] Implement rate limiting
-- [ ] Add input sanitization
-- [ ] Enable ProGuard/R8 (Android)
-- [ ] Conduct security audit
-- [ ] Implement certificate pinning (if needed)
-
-### Phase 11: Beta Testing & Refinement
-
-#### Task 11.1: Beta Preparation
-- [ ] Prepare beta builds (Android: Internal Testing, iOS: TestFlight)
-- [ ] Create beta tester documentation (English and Polish)
-- [ ] Set up feedback collection mechanism
-- [ ] Create bug reporting template
-- [ ] Recruit beta testers (include Polish speakers)
-
-#### Task 11.2: Beta Testing
-- [ ] Distribute beta builds
-- [ ] Monitor crash reports
-- [ ] Collect user feedback
-- [ ] Track usage analytics
-- [ ] Identify and prioritize issues
-
-#### Task 11.3: Bug Fixes & Refinements
-- [ ] Fix critical bugs
-- [ ] Address user feedback
-- [ ] Improve performance based on analytics
-- [ ] Update documentation
-- [ ] Prepare for public release
-
-### Phase 12: Launch Preparation
-
-#### Task 12.1: App Store Preparation
-- [ ] Create app store listings (Google Play) in English and Polish
-- [ ] Create app store listings (App Store) in English and Polish
-- [ ] Set up web hosting and domain for Web version
-- [ ] Prepare screenshots and promotional materials (both languages)
-- [ ] Write app descriptions (both languages)
-- [ ] Create privacy policy (English and Polish)
-- [ ] Create terms of service (English and Polish)
-
-#### Task 12.2: Final Checks
-- [ ] Complete final QA pass (both languages)
-- [ ] Review all app store requirements
-- [ ] Verify Firebase configuration (production)
-- [ ] Test production builds
-- [ ] Verify offline-first functionality
-- [ ] Test fail-fast error handling in production
-- [ ] Prepare rollback plan
-
-#### Task 12.3: Launch
-- [ ] Submit to Google Play
-- [ ] Submit to App Store
-- [ ] Deploy Web version to production
-- [ ] Monitor submission review process
-- [ ] Prepare launch announcement (English and Polish)
-- [ ] Set up monitoring and alerts
-- [ ] Launch app!
-
-### Phase 13: Post-Launch (Ongoing)
-
-#### Task 13.1: Monitoring
-- [ ] Monitor crash reports (pay attention to fail-fast crashes)
-- [ ] Monitor user reviews (in both English and Polish)
-- [ ] Track key metrics (DAU, MAU, retention)
-- [ ] Monitor Firebase usage and costs
-- [ ] Monitor offline functionality performance
-- [ ] Set up alerts for critical issues
-
-#### Task 13.2: Maintenance
-- [ ] Respond to user feedback (in English and Polish)
-- [ ] Fix bugs as they arise
-- [ ] Update dependencies
-- [ ] Address security vulnerabilities
-- [ ] Maintain compatibility with new OS versions
-- [ ] Update translations as needed
-
-#### Task 13.3: Future Enhancements
-- [ ] Plan feature roadmap
-- [ ] Implement savings goals feature
-- [ ] Expand interest/rewards system
-- [ ] Implement transfer between siblings
-- [ ] Add spending analytics and insights
-- [ ] Create educational content for financial literacy
-- [ ] Multi-currency support
+#### Post-Launch
+- [ ] Crash monitoring and alerting
+- [ ] User feedback collection
+- [ ] Feature roadmap: savings goals, sibling transfers, spending analytics, multi-currency
 
 ## Success Metrics
 
